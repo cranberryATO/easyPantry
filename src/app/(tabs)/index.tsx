@@ -1,9 +1,11 @@
 import { EasyCounter } from "@/components/EasyCounter";
+import { sharedStyles } from "@/theme/styles";
 import * as Theme from "@/theme/theme";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Crypto from "expo-crypto";
 import { useEffect, useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const INVENTORY_KEY = "inventory";
 
@@ -11,6 +13,7 @@ export type InventorySection = {
   sectionName: string;
   sectionOrder: number;
   items: InventoryItem[];
+  id: string;
 };
 
 export type InventoryItem = {
@@ -18,6 +21,7 @@ export type InventoryItem = {
   desiredCount: number;
   currentCount: number;
   orderInSection: number;
+  id: string;
 };
 
 export type Inventory = {
@@ -31,126 +35,147 @@ const DEFAULT_INVENTORY: Inventory = {
     {
       sectionName: "🛖Réserve",
       sectionOrder: 1,
+      id: Crypto.randomUUID(),
       items: [
         {
-          itemName: "Papier Toilette (pack de 12)",
+          itemName: "🚽Papier Toilette (pack de 12)",
           desiredCount: 3,
           currentCount: 0,
           orderInSection: 1,
+          id: Crypto.randomUUID(),
         },
         {
-          itemName: "Sopalin (pack de 4)",
+          itemName: "⬜Sopalin (pack de 4)",
           desiredCount: 2,
           currentCount: 0,
           orderInSection: 2,
+          id: Crypto.randomUUID(),
         },
         {
           itemName: "Mayonnaise",
           desiredCount: 1,
           currentCount: 0,
           orderInSection: 3,
+          id: Crypto.randomUUID(),
         },
         {
           itemName: "Moutarde",
           desiredCount: 1,
           currentCount: 0,
           orderInSection: 4,
+          id: Crypto.randomUUID(),
         },
       ],
     },
     {
       sectionName: "❄️Congélateur",
       sectionOrder: 2,
+      id: Crypto.randomUUID(),
       items: [
         {
           itemName: "Pizza",
           desiredCount: 5,
           currentCount: 0,
           orderInSection: 1,
+          id: Crypto.randomUUID(),
         },
         {
           itemName: "Glace vanille",
           desiredCount: 2,
           currentCount: 0,
           orderInSection: 2,
+          id: Crypto.randomUUID(),
         },
         {
           itemName: "Poulet",
           desiredCount: 3,
           currentCount: 0,
           orderInSection: 3,
+          id: Crypto.randomUUID(),
         },
         {
           itemName: "Viande hachée",
           desiredCount: 2,
           currentCount: 0,
           orderInSection: 4,
+          id: Crypto.randomUUID(),
         },
         {
           itemName: "Frites",
           desiredCount: 2,
           currentCount: 0,
           orderInSection: 5,
+          id: Crypto.randomUUID(),
         },
       ],
     },
     {
       sectionName: "🍅Réfrigérateur",
       sectionOrder: 3,
+      id: Crypto.randomUUID(),
       items: [
         {
           itemName: "Salade",
           desiredCount: 1,
           currentCount: 0,
           orderInSection: 1,
+          id: Crypto.randomUUID(),
         },
         {
           itemName: "Tomates",
           desiredCount: 1,
           currentCount: 0,
           orderInSection: 2,
+          id: Crypto.randomUUID(),
         },
         {
           itemName: "Yaourts",
           desiredCount: 1,
           currentCount: 0,
           orderInSection: 3,
+          id: Crypto.randomUUID(),
         },
       ],
     },
     {
       sectionName: "🥖Placards",
       sectionOrder: 4,
+      id: Crypto.randomUUID(),
       items: [
         {
           itemName: "Chips",
           desiredCount: 1,
           currentCount: 0,
           orderInSection: 1,
+          id: Crypto.randomUUID(),
         },
         {
           itemName: "Pâtes",
           desiredCount: 2,
           currentCount: 0,
           orderInSection: 2,
+          id: Crypto.randomUUID(),
         },
         {
           itemName: "Riz",
           desiredCount: 1,
           currentCount: 0,
           orderInSection: 3,
+          id: Crypto.randomUUID(),
         },
         {
           itemName: "Farine",
           desiredCount: 1,
           currentCount: 0,
           orderInSection: 4,
+          id: Crypto.randomUUID(),
         },
         {
           itemName: "Sucre",
           desiredCount: 1,
           currentCount: 0,
           orderInSection: 5,
+          id: Crypto.randomUUID(),
         },
       ],
     },
@@ -171,12 +196,6 @@ export default function Inventory() {
     hasSeeded: false,
     sections: [],
   });
-  const [editingText, setEditingText] = useState<string>("");
-  const [editingItem, setEditingItem] = useState<{
-    isEditing: boolean;
-    sectionIndex: number;
-    itemIndex: number;
-  }>({ isEditing: false, sectionIndex: 0, itemIndex: 0 });
 
   // Load inventory from AsyncStorage on component mount
   useEffect(() => {
@@ -185,7 +204,6 @@ export default function Inventory() {
       console.log("Loaded inventory:", stored);
       if (!stored.hasSeeded) {
         setInventory(DEFAULT_INVENTORY);
-        await saveInventory(DEFAULT_INVENTORY);
       } else {
         setInventory(stored);
       }
@@ -219,227 +237,23 @@ export default function Inventory() {
     });
   }
 
-  function renameItem(
-    sectionIndex: number,
-    itemIndex: number,
-    newName: string,
-  ) {
-    const trimmed = newName.trim();
-    if (!trimmed) return;
-    setInventory((prev) => {
-      const newInventory = structuredClone(prev);
-      newInventory.sections[sectionIndex].items[itemIndex].itemName = trimmed;
-      return newInventory;
-    });
-  }
-
-  function handleRemoveItem(sectionIndex: number, itemIndex: number) {
-    setInventory((prev) => {
-      const newInventory = structuredClone(prev);
-      newInventory.sections[sectionIndex].items.splice(itemIndex, 1);
-      console.log(`Removed item at section ${sectionIndex}, item ${itemIndex}`);
-      setEditingItem({ isEditing: false, sectionIndex: 0, itemIndex: 0 });
-      return newInventory;
-    });
-  }
-
-  function handleMoveItem(
-    sectionIndex: number,
-    itemIndex: number,
-    direction: "up" | "down",
-  ) {
-    setInventory((prev) => {
-      const newInventory = structuredClone(prev);
-      const items = newInventory.sections[sectionIndex].items;
-      let newItemIndex = itemIndex;
-      let newSectionIndex = sectionIndex;
-      if (direction === "up") {
-        if (itemIndex > 0) {
-          [items[itemIndex - 1], items[itemIndex]] = [
-            items[itemIndex],
-            items[itemIndex - 1],
-          ];
-          newItemIndex = itemIndex - 1;
-        } else {
-          // moving item to previous section if it exists
-          if (sectionIndex > 0) {
-            const prevSectionItems =
-              newInventory.sections[sectionIndex - 1].items;
-            const itemToMove = items[itemIndex];
-            // Remove from current section
-            items.splice(itemIndex, 1);
-            // Add to previous section at the end
-            newItemIndex = prevSectionItems.length;
-            prevSectionItems.push(itemToMove);
-            newSectionIndex = sectionIndex - 1;
-          }
-        }
-      } else if (direction === "down") {
-        if (itemIndex < items.length - 1) {
-          [items[itemIndex + 1], items[itemIndex]] = [
-            items[itemIndex],
-            items[itemIndex + 1],
-          ];
-          newItemIndex = itemIndex + 1;
-        } else {
-          // moving item to next section if it exists
-          if (sectionIndex < newInventory.sections.length - 1) {
-            const nextSectionItems =
-              newInventory.sections[sectionIndex + 1].items;
-            const itemToMove = items[itemIndex];
-            // Remove from current section
-            items.splice(itemIndex, 1);
-            // Add to next section at the beginning
-            nextSectionItems.unshift(itemToMove);
-            newSectionIndex = sectionIndex + 1;
-            newItemIndex = 0;
-          }
-        }
-      }
-      setEditingItem({
-        isEditing: true,
-        sectionIndex: newSectionIndex,
-        itemIndex: newItemIndex,
-      });
-      console.log(
-        `Moved item from section ${sectionIndex}, item ${itemIndex} to section ${newSectionIndex}, item ${newItemIndex}`,
-      );
-      return newInventory;
-    });
-  }
-
   return (
-    <View style={styles.page}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.headerLabel}>Objectif</Text>
-        <Text style={styles.headerLabel}>Actuel</Text>
-      </View>
+    <SafeAreaView style={sharedStyles.page}>
       <ScrollView>
         {inventory.sections.map((section, sectionIndex) => (
-          <View key={sectionIndex} style={styles.section}>
-            <Text style={styles.sectionTitle}>{section.sectionName}</Text>
+          <View key={section.id} style={sharedStyles.section}>
+            <View style={sharedStyles.sectionTitleContainer}>
+              <Text style={sharedStyles.sectionTitle}>
+                {section.sectionName}
+              </Text>
+            </View>
             {section.items.map((item, itemIndex) => (
-              <View key={itemIndex}>
-                {/* When editing, show a TextInput instead of the Text
-                  component and show a delete button and a "move" handle*/}
-                {editingItem.isEditing &&
-                editingItem.sectionIndex === sectionIndex &&
-                editingItem.itemIndex === itemIndex ? (
-                  <View
-                    style={styles.itemContainer}
-                    onBlur={() => {
-                      renameItem(sectionIndex, itemIndex, editingText);
-                      setEditingItem({
-                        isEditing: false,
-                        sectionIndex: 0,
-                        itemIndex: 0,
-                      });
-                    }}
-                  >
-                    <View style={styles.editingSideContainer}>
-                      <Pressable
-                        style={styles.editingLeftButton}
-                        onMouseDown={(e: any) => e.preventDefault()}
-                        onPress={() => {
-                          handleMoveItem(sectionIndex, itemIndex, "down");
-                        }}
-                      >
-                        <MaterialCommunityIcons
-                          name="arrow-down-bold-outline"
-                          size={Theme.BUTTON_ICON_SIZE}
-                          color="black"
-                        />
-                      </Pressable>
-                      <Pressable
-                        style={styles.editingRightButton}
-                        onMouseDown={(e: any) => e.preventDefault()}
-                        onPress={() => {
-                          handleMoveItem(sectionIndex, itemIndex, "up");
-                        }}
-                      >
-                        <MaterialCommunityIcons
-                          name="arrow-up-bold-outline"
-                          size={Theme.BUTTON_ICON_SIZE}
-                          color="black"
-                        />
-                      </Pressable>
-                    </View>
-                    <View style={styles.editingMiddleContainer}>
-                      <TextInput
-                        style={styles.itemNameTextInput}
-                        value={editingText}
-                        onChangeText={setEditingText}
-                      />
-                    </View>
-                    <View style={styles.editingSideContainer}>
-                      <Pressable
-                        style={styles.editingLeftButton}
-                        onMouseDown={(e: any) => e.preventDefault()}
-                        onPress={() => {
-                          renameItem(sectionIndex, itemIndex, editingText);
-                          setEditingItem({
-                            isEditing: false,
-                            sectionIndex: 0,
-                            itemIndex: 0,
-                          });
-                        }}
-                      >
-                        <MaterialCommunityIcons
-                          name="check"
-                          size={Theme.BUTTON_ICON_SIZE}
-                          color="black"
-                        />
-                      </Pressable>
-                      <Pressable
-                        style={styles.editingRightButton}
-                        onMouseDown={(e: any) => e.preventDefault()}
-                        onPress={() => {
-                          handleRemoveItem(sectionIndex, itemIndex);
-                        }}
-                      >
-                        <MaterialCommunityIcons
-                          name="trash-can-outline"
-                          size={Theme.BUTTON_ICON_SIZE}
-                          color="black"
-                        />
-                      </Pressable>
-                    </View>
-                  </View>
-                ) : (
-                  <View style={styles.itemContainer}>
-                    <EasyCounter
-                      enabled={
-                        !editingItem.isEditing /* if isEditingis true then it is editing another item */
-                      }
-                      count={item.desiredCount}
-                      onChange={(newCount) =>
-                        updateItemCount(
-                          sectionIndex,
-                          itemIndex,
-                          "desiredCount",
-                          newCount,
-                        )
-                      }
-                    />
-
-                    <Pressable
-                      style={styles.itemName}
-                      onLongPress={() => {
-                        setEditingItem({
-                          isEditing: true,
-                          sectionIndex,
-                          itemIndex,
-                        });
-                        setEditingText(item.itemName);
-                      }}
-                      disabled={
-                        editingItem.isEditing /* if isEditingis true then it is editing another item */
-                      }
-                    >
-                      <Text style={styles.itemNameText} numberOfLines={1}>
-                        {item.itemName}
-                      </Text>
-                    </Pressable>
+              <View key={item.id}>
+                <View style={sharedStyles.itemContainer}>
+                  <Text style={sharedStyles.itemNameText} numberOfLines={1}>
+                    {item.itemName}
+                  </Text>
+                  <View style={styles.buttonsContainer}>
                     <EasyCounter
                       count={item.currentCount}
                       onChange={(newCount) =>
@@ -450,87 +264,29 @@ export default function Inventory() {
                           newCount,
                         )
                       }
-                      enabled={
-                        !editingItem.isEditing /* if isEditingis true then it is editing another item */
-                      }
+                      total={item.desiredCount}
+                      reverse={true}
                     />
                   </View>
-                )}
+                </View>
               </View>
             ))}
           </View>
         ))}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = {
-  page: {
-    flex: 1,
-    backgroundColor: Theme.COLOR_BACKGROUND,
-    padding: 4,
-  },
-  headerContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  headerLabel: {
-    borderRadius: 100,
-    backgroundColor: Theme.COLOR_BUTTON,
-    padding: 10,
-    width: 110,
-    textAlign: "center",
-    fontSize: 15,
-    fontWeight: "bold",
-  },
-  header: {
-    fontSize: 15,
-  },
-  item: {},
-  itemName: {
-    paddingHorizontal: 10,
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  itemNameText: {
-    fontSize: 16,
-    textAlign: "center",
-  },
-  itemNameTextInput: {
-    flex: 1,
-    minWidth: 0,
-    fontSize: 16,
-    textAlign: "center",
-    borderWidth: 1,
-    borderColor: Theme.COLOR_GRAY_30,
-    borderRadius: 50,
-    backgroundColor: Theme.COLOR_GRAY_10,
-  },
   itemContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginVertical: 5,
+    //marginVertical: 1,
     padding: 2,
-    backgroundColor: "white",
-    borderRadius: 100,
+    //backgroundColor: "white",
+    //borderRadius: 100,
     height: 40,
-  },
-  section: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 13,
-    fontWeight: "bold",
-    textTransform: "uppercase",
-    color: Theme.COLOR_GRAY_50,
-    marginBottom: 2,
-    paddingHorizontal: 4,
-    paddingTop: 4,
-    paddingBottom: 4,
-    margin: 0,
-    textAlign: "center",
   },
   editingSideContainer: {
     flexDirection: "row",
@@ -557,5 +313,10 @@ const styles = {
     justifyContent: "center",
     borderRadius: 100,
     backgroundColor: Theme.COLOR_BUTTON,
+  },
+  buttonsContainer: {
+    width: "30%",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
 };

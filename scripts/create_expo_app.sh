@@ -3,3 +3,5 @@ cd $1
 npm run reset-project
 npx expo install @expo/vector-icons
 npx expo install @react-native-async-storage/async-storage
+npx expo install expo-crypto
+

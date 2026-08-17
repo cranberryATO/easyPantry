@@ -6,6 +6,20 @@ export default function TabLayout() {
   return (
     <Tabs>
       <Tabs.Screen
+        name="inventory_settings"
+        options={{
+          headerShown: false,
+          title: "Configurer le stock",
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialCommunityIcons
+              name={focused ? "store-settings" : "store-settings-outline"}
+              color={color}
+              size={24}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="index"
         options={{
           headerShown: false,

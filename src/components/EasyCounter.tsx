@@ -1,42 +1,54 @@
+import { IconButton } from "@/components/IconButton";
 import * as Theme from "@/theme/theme";
-import Entypo from "@expo/vector-icons/Entypo";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 export function EasyCounter({
   count,
   onChange,
+  total = -1,
   enabled = true,
+  reverse = false,
 }: {
   count: number;
   onChange: (newCount: number) => void;
+  total?: number;
   enabled?: boolean;
+  reverse?: boolean;
 }) {
+  const leftDelta = reverse ? 1 : -1;
+  const rightDelta = reverse ? -1 : 1;
+  const leftIcon = reverse ? Theme.ICON_COUNTER_PLUS : Theme.ICON_COUNTER_MINUS;
+  const rightIcon = reverse
+    ? Theme.ICON_COUNTER_MINUS
+    : Theme.ICON_COUNTER_PLUS;
+
   return (
-    <View style={styles.container}>
-      <Pressable
+    <>
+      <IconButton
         style={[styles.buttonLeft, !enabled && styles.disabledButton]}
         onPress={() => {
           // Decrease count logic here
-          onChange(count - 1);
+          onChange(count + leftDelta);
         }}
         disabled={!enabled}
-      >
-        <Entypo name="minus" size={Theme.BUTTON_ICON_SIZE} color="black" />
-      </Pressable>
+        icon={leftIcon}
+      />
       <View style={styles.buttonMiddle}>
-        <Text style={styles.countText}>{count}</Text>
+        <Text style={styles.countText}>
+          {count}
+          {total > 0 && "/" + total}
+        </Text>
       </View>
-      <Pressable
+      <IconButton
         style={[styles.buttonRight, !enabled && styles.disabledButton]}
         onPress={() => {
           // Increase count logic here
-          onChange(count + 1);
+          onChange(count + rightDelta);
         }}
         disabled={!enabled}
-      >
-        <Entypo name="plus" size={Theme.BUTTON_ICON_SIZE} color="black" />
-      </Pressable>
-    </View>
+        icon={rightIcon}
+      />
+    </>
   );
 }
 
@@ -44,43 +56,36 @@ const styles = {
   container: {
     flexDirection: "row",
   },
-  buttonText: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
   countText: {
-    fontSize: 24,
+    fontSize: Theme.BUTTON_FONT_SIZE,
     lineHeight: 22,
     textAlign: "center",
   },
+
   buttonLeft: {
-    width: 35,
-    borderTopLeftRadius: 100,
-    borderBottomLeftRadius: 100,
+    //width: 35,
+    //borderTopLeftRadius: 100,
+    //borderBottomLeftRadius: 100,
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 4,
-    backgroundColor: Theme.COLOR_BUTTON,
+    //    backgroundColor: Theme.COLOR_BUTTON,
     //borderRadius: 100,
   },
   buttonMiddle: {
-    width: 40,
+    //width: 40,
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 4,
   },
   buttonRight: {
-    width: 35,
-    borderTopRightRadius: 100,
-    borderBottomRightRadius: 100,
+    //width: 35,
+    //borderTopRightRadius: 100,
+    //borderBottomRightRadius: 100,
     //borderRadius: 100,
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 4,
-    backgroundColor: Theme.COLOR_BUTTON,
-  },
-  disabledButton: {
-    backgroundColor: Theme.COLOR_GRAY_30,
+    //backgroundColor: Theme.COLOR_BUTTON,
   },
 };
