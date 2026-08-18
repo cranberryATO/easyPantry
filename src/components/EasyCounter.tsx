@@ -1,6 +1,7 @@
 import { IconButton } from "@/components/IconButton";
+import { sharedStyles } from "@/theme/styles";
 import * as Theme from "@/theme/theme";
-import { Text, View } from "react-native";
+import { Text } from "react-native";
 
 export function EasyCounter({
   count,
@@ -25,7 +26,7 @@ export function EasyCounter({
   return (
     <>
       <IconButton
-        style={[styles.buttonLeft, !enabled && styles.disabledButton]}
+        style={!enabled && sharedStyles.disabledButton}
         onPress={() => {
           // Decrease count logic here
           onChange(count + leftDelta);
@@ -33,14 +34,12 @@ export function EasyCounter({
         disabled={!enabled}
         icon={leftIcon}
       />
-      <View style={styles.buttonMiddle}>
-        <Text style={styles.countText}>
-          {count}
-          {total > 0 && "/" + total}
-        </Text>
-      </View>
+      <Text style={styles.countText}>
+        {count}
+        {total > 0 && "/" + total}
+      </Text>
       <IconButton
-        style={[styles.buttonRight, !enabled && styles.disabledButton]}
+        style={!enabled && sharedStyles.disabledButton}
         onPress={() => {
           // Increase count logic here
           onChange(count + rightDelta);
@@ -53,39 +52,10 @@ export function EasyCounter({
 }
 
 const styles = {
-  container: {
-    flexDirection: "row",
-  },
   countText: {
     fontSize: Theme.BUTTON_FONT_SIZE,
     lineHeight: 22,
     textAlign: "center",
-  },
-
-  buttonLeft: {
-    //width: 35,
-    //borderTopLeftRadius: 100,
-    //borderBottomLeftRadius: 100,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 4,
-    //    backgroundColor: Theme.COLOR_BUTTON,
-    //borderRadius: 100,
-  },
-  buttonMiddle: {
-    //width: 40,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 4,
-  },
-  buttonRight: {
-    //width: 35,
-    //borderTopRightRadius: 100,
-    //borderBottomRightRadius: 100,
-    //borderRadius: 100,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 4,
-    //backgroundColor: Theme.COLOR_BUTTON,
+    alignSelf: "center",
   },
 };

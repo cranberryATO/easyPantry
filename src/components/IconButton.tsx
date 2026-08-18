@@ -37,5 +37,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     borderRadius: 1000,
     overflow: "hidden",
+    alignItems: "center",
   },
 });

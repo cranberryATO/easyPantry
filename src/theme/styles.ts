@@ -22,13 +22,14 @@ export const sharedStyles = StyleSheet.create({
   header: {
     fontSize: 15,
   },
-  item: {},
   itemName: {
-    justifyContent: "center",
+    flexShrink: 1,
+    flexDirection: "row",
+    alignItems: "center",
   },
   itemNameText: {
+    flexShrink: 1,
     fontSize: 16,
-    alignSelf: "center",
   },
   itemNameTextInput: {
     paddingHorizontal: 10,
@@ -43,8 +44,10 @@ export const sharedStyles = StyleSheet.create({
     paddingVertical: 0,
   },
   itemContainer: {
+    flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
     padding: 2,
     height: 40,
   },
@@ -85,9 +88,5 @@ export const sharedStyles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  buttonsContainer: {
-    width: "50%",
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
+  disabledButton: {},
 });
