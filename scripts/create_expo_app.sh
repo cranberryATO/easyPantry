@@ -5,3 +5,4 @@ npx expo install @expo/vector-icons
 npx expo install @react-native-async-storage/async-storage
 npx expo install expo-crypto
 
+npm install immer

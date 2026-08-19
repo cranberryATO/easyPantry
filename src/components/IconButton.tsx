@@ -4,14 +4,14 @@ import { Pressable, StyleSheet, View } from "react-native";
 
 export function IconButton({
   icon,
-  style,
+  style = {},
   onPress,
   disabled,
 }: {
   icon: string;
-  style: any;
+  style?: any;
   onPress: () => void;
-  disabled: boolean;
+  disabled?: boolean;
 }) {
   return (
     <View style={styles.container}>
