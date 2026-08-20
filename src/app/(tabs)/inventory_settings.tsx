@@ -2,7 +2,7 @@ import { useInventory } from "@/components/InventoryProvider";
 import { InventorySettingsSection } from "@/components/InventorySettings";
 import { sharedStyles } from "@/theme/styles";
 import { useCallback } from "react";
-import { FlatList } from "react-native";
+import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function InventorySettings() {
@@ -39,9 +39,8 @@ export default function InventorySettings() {
 
   return (
     <SafeAreaView style={sharedStyles.page}>
-      <FlatList data=>
+      <ScrollView>
         {inventoryContext.inventory.sections.map((section) => (
-
           <InventorySettingsSection
             key={section.id}
             sectionId={section.id}
@@ -54,7 +53,7 @@ export default function InventorySettings() {
             onRemove={handleRemoveItem}
           />
         ))}
-      </FlatList>
+      </ScrollView>
     </SafeAreaView>
   );
 }
