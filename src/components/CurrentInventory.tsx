@@ -3,7 +3,21 @@ import { sharedStyles } from "@/theme/styles";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-export const CurrentInventoryRow = React.memo(function CurrentInventoryRow({
+export function CurrentInventorySectionHeader({
+  id,
+  name,
+}: {
+  id: string;
+  name: string;
+}) {
+  return (
+    <View style={sharedStyles.sectionTitleContainer}>
+      <Text style={sharedStyles.sectionTitle}>{name}</Text>
+    </View>
+  );
+}
+
+export const CurrentInventoryItem = React.memo(function CurrentInventoryItem({
   itemId,
   itemName,
   currentCount,

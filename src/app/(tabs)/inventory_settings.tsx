@@ -1,8 +1,13 @@
 import { useInventory } from "@/components/InventoryProvider";
-import { InventorySettingsSection } from "@/components/InventorySettings";
+import {
+  InventorySettingsItem,
+  InventorySettingsSectionHeader,
+} from "@/components/InventorySettings";
+import { InventoryRow } from "@/services/inventory";
 import { sharedStyles } from "@/theme/styles";
 import { useCallback } from "react";
-import { ScrollView } from "react-native";
+import { FlatList } from "react-native";
+import Animated, { LinearTransition } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function InventorySettings() {
@@ -37,23 +42,52 @@ export default function InventorySettings() {
     [],
   );
 
-  return (
-    <SafeAreaView style={sharedStyles.page}>
-      <ScrollView>
-        {inventoryContext.inventory.sections.map((section) => (
-          <InventorySettingsSection
-            key={section.id}
-            sectionId={section.id}
-            sectionName={section.sectionName}
-            items={section.items}
+  const keyExtractor = useCallback((row: InventoryRow) => row.id, []);
+
+  const renderItem = useCallback(
+    ({ item: row }: { item: InventoryRow }) =>
+      row.type === "section" ? (
+        <Animated.View
+          style={sharedStyles.sectionTitleContainer}
+          layout={LinearTransition}
+        >
+          <InventorySettingsSectionHeader
+            id={row.id}
+            name={row.name}
             onAddNewItem={handleAddNewItemToSection}
+          />
+        </Animated.View>
+      ) : (
+        <Animated.View
+          style={sharedStyles.itemContainer}
+          layout={LinearTransition}
+        >
+          <InventorySettingsItem
+            itemId={row.id}
+            itemName={row.name}
+            itemCount={row.desiredCount}
             onChangeItemCount={handleItemCountChanged}
             onChangeItemName={handleItemNameChanged}
             onMove={handleMoveItem}
             onRemove={handleRemoveItem}
           />
-        ))}
-      </ScrollView>
+        </Animated.View>
+      ),
+    [],
+  );
+
+  const handleDragEnd = useCallback(
+    ({ data }: { data: InventoryRow[] }) => inventoryContext.replaceRows(data),
+    [],
+  );
+
+  return (
+    <SafeAreaView style={sharedStyles.page}>
+      <FlatList
+        data={inventoryContext.inventory.rows}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+      />
     </SafeAreaView>
   );
 }

@@ -5,49 +5,32 @@ const INVENTORY_KEY = "inventory";
 const ITEMS_MAX = 99;
 
 export type InventorySection = {
-  sectionName: string;
-  sectionOrder: number;
-  items: InventoryItem[];
+  type: "section";
   id: string;
+  name: string;
 };
 
 export type InventoryItem = {
-  itemName: string;
+  type: "item";
+  id: string;
+  name: string;
   desiredCount: number;
   currentCount: number;
-  orderInSection: number;
-  id: string;
 };
+
+export type InventoryRow = InventorySection | InventoryItem;
 
 export type Inventory = {
   hasSeeded: boolean;
-  sections: InventorySection[];
+  rows: InventoryRow[];
 };
-
-export function compareInventoryItems(a: InventoryItem, b: InventoryItem) {
-  return a.orderInSection - b.orderInSection;
-}
 
 export async function loadInventory(): Promise<Inventory> {
   const raw = await AsyncStorage.getItem(INVENTORY_KEY);
   if (raw === null) {
-    return { hasSeeded: false, sections: [] };
+    return { hasSeeded: false, rows: [] };
   }
-  // On load, normalize the order values
   const inventory = JSON.parse(raw);
-  inventory.sections.sort(
-    (a: InventorySection, b: InventorySection) =>
-      a.sectionOrder - b.sectionOrder,
-  );
-  inventory.sections.forEach(
-    (section: InventorySection, sectionIndex: number) => {
-      section.sectionOrder = sectionIndex;
-      section.items.sort(compareInventoryItems);
-      section.items.forEach((item: InventoryItem, itemIndex: number) => {
-        item.orderInSection = itemIndex;
-      });
-    },
-  );
   return inventory;
 }
 
@@ -55,71 +38,42 @@ export async function saveInventory(items: Inventory): Promise<void> {
   await AsyncStorage.setItem(INVENTORY_KEY, JSON.stringify(items));
 }
 
-function findItemIndex(
-  inventory: Inventory,
-  itemId: string,
-): { sectionIndex: number; itemIndex: number } {
-  for (const [sectionIndex, section] of inventory.sections.entries()) {
-    const itemIndex = section.items.findIndex((item) => item.id === itemId);
-    if (itemIndex !== -1) {
-      return { sectionIndex, itemIndex };
-    }
-  }
-  return { sectionIndex: -1, itemIndex: -1 };
+function findRowIndex(inventory: Inventory, id: string): number {
+  return inventory.rows.findIndex((row) => row.id === id);
 }
 
-function findItem(
-  inventory: Inventory,
-  itemId: string,
-): { section: InventorySection | null; item: InventoryItem | null } {
-  for (const section of inventory.sections) {
-    const item = section.items.find((item) => item.id === itemId);
-    if (item != null) {
-      return { section, item };
-    }
-  }
-  return { section: null, item: null };
+function findRow(inventory: Inventory, id: string): InventoryRow | undefined {
+  return inventory.rows.find((row) => row.id === id);
 }
 
-function sectionMaxOrder(section: InventorySection): number {
-  return section.items.length === 0
-    ? 0
-    : section.items.reduce(
-        (maxOrder, item) => Math.max(maxOrder, item.orderInSection),
-        -Infinity,
-      );
+function findItem(inventory: Inventory, id: string): InventoryItem | undefined {
+  const row = inventory.rows.find((row) => row.id === id);
+  return row == undefined || row?.type !== "item" ? undefined : row;
 }
 
-function sectionMinOrder(section: InventorySection): number {
-  return section.items.length === 0
-    ? 0
-    : section.items.reduce(
-        (minOrder, item) => Math.min(minOrder, item.orderInSection),
-        Infinity,
-      );
+function findItemIndex(inventory: Inventory, id: string): number {
+  return inventory.rows.findIndex(
+    (row) => row.id === id && row.type === "item",
+  );
 }
 
 // Modify inventory IN PLACE
 export function updateItemCount(
   inventory: Inventory,
-  itemId: string,
+  id: string,
   field: "desiredCount" | "currentCount",
   newCount: number,
 ) {
-  const { item } = findItem(inventory, itemId);
-  if (item !== null) {
+  const item = findItem(inventory, id);
+  if (item != null) {
     item[field] = Math.min(ITEMS_MAX, Math.max(0, newCount));
   }
 }
 
-export function renameItem(
-  inventory: Inventory,
-  itemId: string,
-  newName: string,
-) {
-  const { item } = findItem(inventory, itemId);
-  if (item !== null) {
-    item.itemName = newName;
+export function renameRow(inventory: Inventory, id: string, newName: string) {
+  const row = findRow(inventory, id);
+  if (row != null) {
+    row.name = newName;
   }
 }
 
@@ -128,99 +82,58 @@ export function moveItem(
   itemId: string,
   direction: "up" | "down",
 ) {
-  // Items are not sorted in the inventory, they are sorted at render.
-  // So to move an item up, 2 cases :
-  // 1st in section by order : put it at the end of previous section
-  // 2nd in section by order : order becomes order of first in section minus 1
-  // 3rd or more in section : order becomes the middle of the two items before it.
-  const { sectionIndex, itemIndex } = findItemIndex(inventory, itemId);
-  if (sectionIndex === -1) {
+  const index = findItemIndex(inventory, itemId);
+  if (index === -1) {
     return;
   }
-  const section = inventory.sections[sectionIndex];
-  const item = section.items[itemIndex];
-  const sortedSections = inventory.sections.toSorted(
-    (a: InventorySection, b: InventorySection) =>
-      a.sectionOrder - b.sectionOrder,
-  );
-  const sectionSortedIndex = sortedSections.findIndex(
-    (_section) => _section.id === section.id,
-  );
-  const sortedItems = section.items.toSorted(compareInventoryItems);
-  const itemSortedIndex = sortedItems.findIndex((_item) => _item.id === itemId);
-  if (direction === "up") {
-    if (itemSortedIndex === 0) {
-      // Move at the end of previous section
-      // Unless first section then do nothing.
-      if (sectionSortedIndex > 0) {
-        // remove from current section
-        section.items.splice(itemIndex, 1);
-        // add to other section, and set order at the max of that section + 1
-        const newSection = sortedSections[sectionSortedIndex - 1];
-        item.orderInSection = sectionMaxOrder(newSection) + 1;
-        newSection.items.push(item);
+  const row = inventory.rows[index];
+  if (row.type === "item") {
+    const item = row;
+
+    if (direction === "up") {
+      if (index > 1) {
+        // can't move higher than first section header
+        [inventory.rows[index], inventory.rows[index - 1]] = [
+          inventory.rows[index - 1],
+          inventory.rows[index],
+        ];
       }
-    } else if (itemSortedIndex === 1) {
-      // Becomes the smallest order in section
-      item.orderInSection = sortedItems[0].orderInSection - 1;
-    } else {
-      // Becomes the mean of two previous items
-      item.orderInSection =
-        (sortedItems[itemSortedIndex - 1].orderInSection +
-          sortedItems[itemSortedIndex - 2].orderInSection) /
-        2;
-    }
-  } else if (direction === "down") {
-    if (itemSortedIndex === sortedItems.length - 1) {
-      // Move at the beginning of next section
-      // Unless last section then do nothing.
-      if (sectionSortedIndex < inventory.sections.length - 1) {
-        // remove from current section
-        section.items.splice(itemIndex, 1);
-        // add to other section, and set order at the min of that section - 1
-        const newSection = sortedSections[sectionSortedIndex + 1];
-        item.orderInSection = sectionMinOrder(newSection) - 1;
-        newSection.items.push(item);
+    } else if (direction === "down") {
+      if (index < inventory.rows.length - 1) {
+        [inventory.rows[index], inventory.rows[index + 1]] = [
+          inventory.rows[index + 1],
+          inventory.rows[index],
+        ];
       }
-    } else if (itemSortedIndex === sortedItems.length - 2) {
-      // Becomes the highest order in section
-      item.orderInSection = sortedItems[itemSortedIndex + 1].orderInSection + 1;
-    } else {
-      // Becomes the mean of two next items
-      item.orderInSection =
-        (sortedItems[itemSortedIndex + 1].orderInSection +
-          sortedItems[itemSortedIndex + 2].orderInSection) /
-        2;
     }
   }
 }
 
 export function removeItem(inventory: Inventory, itemId: string) {
-  const { sectionIndex, itemIndex } = findItemIndex(inventory, itemId);
-  if (sectionIndex === -1) {
-    return;
+  const index = findItemIndex(inventory, itemId);
+  if (index !== -1) {
+    inventory.rows.splice(index, 1);
   }
-  inventory.sections[sectionIndex].items.splice(itemIndex, 1);
 }
 
-// Add new item at the beginning of section
 export function addNewItem(
   inventory: Inventory,
-  sectionId: string,
+  afterId: string,
   itemName: string,
 ) {
-  // find section
-  const section = inventory.sections.find(
-    (section) => section.id === sectionId,
-  );
-  if (section == null) {
-    return;
+  const index = findRowIndex(inventory, afterId);
+  if (index !== -1) {
+    console.log("add item");
+    inventory.rows.splice(index + 1, 0, {
+      type: "item",
+      name: itemName,
+      id: Crypto.randomUUID(),
+      desiredCount: 1,
+      currentCount: 0,
+    });
   }
-  section.items.push({
-    itemName: itemName,
-    id: Crypto.randomUUID(),
-    desiredCount: 1,
-    currentCount: 0,
-    orderInSection: sectionMinOrder(section) - 1,
-  });
+}
+
+export function replaceRows(inventory: Inventory, rows: InventoryRow[]) {
+  inventory.rows = rows;
 }

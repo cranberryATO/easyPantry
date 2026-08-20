@@ -21,6 +21,7 @@ type InventoryContextValue = {
   moveItem: (itemId: string, direction: "up" | "down") => void;
   removeItem: (itemId: string) => void;
   addNewItem: (itemId: string, itemName: string) => void;
+  replaceRows: (rows: Inventory.InventoryRow[]) => void;
 };
 
 const InventoryContext = createContext<InventoryContextValue | null>(null);
@@ -29,7 +30,7 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
   const [hasLoaded, setHasLoaded] = useState<boolean>(false);
   const [inventory, setInventory] = useState<Inventory.Inventory>({
     hasSeeded: false,
-    sections: [],
+    rows: [],
   });
 
   // Load inventory from AsyncStorage on component mount
@@ -86,7 +87,7 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
   const renameItem = useCallback((itemId: string, newName: string) => {
     setInventory((prev) =>
       produce(prev, (draft) => {
-        Inventory.renameItem(draft, itemId, newName);
+        Inventory.renameRow(draft, itemId, newName);
       }),
     );
   }, []);
@@ -115,6 +116,14 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
     );
   }, []);
 
+  const replaceRows = useCallback((rows: Inventory.InventoryRow[]) => {
+    setInventory((prev) =>
+      produce(prev, (draft) => {
+        Inventory.replaceRows(draft, rows);
+      }),
+    );
+  }, []);
+
   return (
     <InventoryContext.Provider
       value={{
@@ -124,6 +133,7 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
         moveItem,
         removeItem,
         addNewItem,
+        replaceRows,
       }}
     >
       {children}

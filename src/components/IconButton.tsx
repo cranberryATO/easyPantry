@@ -5,12 +5,14 @@ import { Pressable, StyleSheet, View } from "react-native";
 export function IconButton({
   icon,
   style = {},
-  onPress,
+  onPress = () => {},
+  onPressIn = () => {},
   disabled,
 }: {
   icon: string;
   style?: any;
-  onPress: () => void;
+  onPress?: () => void;
+  onPressIn?: () => void;
   disabled?: boolean;
 }) {
   return (
@@ -18,9 +20,9 @@ export function IconButton({
       <Pressable
         style={[style]}
         onPress={onPress}
+        onPressIn={onPressIn}
         disabled={disabled}
         android_ripple={{ color: Theme.COLOR_GRAY_30 }}
-        onMouseDown={(e: any) => e.preventDefault()}
       >
         <MaterialCommunityIcons
           name={icon}
