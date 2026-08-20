@@ -19,6 +19,7 @@ type InventoryContextValue = {
   ) => void;
   renameItem: (itemId: string, newName: string) => void;
   moveItem: (itemId: string, direction: "up" | "down") => void;
+  moveItemByIndex: (itemIndex: number, afterIndex: number) => void;
   removeItem: (itemId: string) => void;
   addNewItem: (itemId: string, itemName: string) => void;
   replaceRows: (rows: Inventory.InventoryRow[]) => void;
@@ -100,6 +101,17 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
     );
   }, []);
 
+  const moveItemByIndex = useCallback(
+    (itemIndex: number, afterIndex: number) => {
+      setInventory((prev) =>
+        produce(prev, (draft) => {
+          Inventory.moveItemByIndex(draft, itemIndex, afterIndex);
+        }),
+      );
+    },
+    [],
+  );
+
   const removeItem = useCallback((itemId: string) => {
     setInventory((prev) =>
       produce(prev, (draft) => {
@@ -131,6 +143,7 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
         updateItemCount,
         renameItem,
         moveItem,
+        moveItemByIndex,
         removeItem,
         addNewItem,
         replaceRows,

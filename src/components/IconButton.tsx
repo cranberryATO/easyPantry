@@ -1,7 +1,7 @@
 import * as Theme from "@/theme/theme";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { ComponentProps } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
-
 export function IconButton({
   icon,
   style = {},
@@ -9,7 +9,7 @@ export function IconButton({
   onPressIn = () => {},
   disabled,
 }: {
-  icon: string;
+  icon: ComponentProps<typeof MaterialCommunityIcons>["name"];
   style?: any;
   onPress?: () => void;
   onPressIn?: () => void;

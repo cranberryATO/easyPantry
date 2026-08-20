@@ -77,6 +77,24 @@ export function renameRow(inventory: Inventory, id: string, newName: string) {
   }
 }
 
+export function moveItemByIndex(
+  inventory: Inventory,
+  itemIndex: number,
+  afterIndex: number,
+) {
+  if (
+    itemIndex < 1 ||
+    itemIndex > inventory.rows.length - 1 ||
+    afterIndex < 1 ||
+    afterIndex > inventory.rows.length - 1 ||
+    itemIndex == afterIndex
+  ) {
+    return;
+  }
+  console.log("move from " + itemIndex + " to " + afterIndex);
+  inventory.rows.splice(afterIndex, 0, inventory.rows.splice(itemIndex, 1)[0]);
+}
+
 export function moveItem(
   inventory: Inventory,
   itemId: string,
