@@ -8,6 +8,7 @@ import {
   CurrentInventoryItem,
   CurrentInventorySectionHeader,
 } from "@/components/CurrentInventory";
+import { InventoryRow } from "@/services/inventory";
 import { useCallback } from "react";
 
 export default function CurrentInventory() {
@@ -20,24 +21,30 @@ export default function CurrentInventory() {
     [],
   );
 
+  const keyExtractor = useCallback((row: InventoryRow) => row.id, []);
+
+  const renderItem = useCallback(
+    ({ item }: { item: InventoryRow }) =>
+      item.type === "section" ? (
+        <CurrentInventorySectionHeader id={item.id} name={item.name} />
+      ) : (
+        <CurrentInventoryItem
+          itemId={item.id}
+          itemName={item.name}
+          currentCount={item.currentCount}
+          desiredCount={item.desiredCount}
+          onChangeItemCount={handleItemCountChanged}
+        />
+      ),
+    [handleItemCountChanged],
+  );
+
   return (
     <SafeAreaView style={sharedStyles.page}>
       <FlatList
         data={inventoryContext.inventory.rows}
-        keyExtractor={(row) => row.id}
-        renderItem={({ item }) =>
-          item.type === "section" ? (
-            <CurrentInventorySectionHeader id={item.id} name={item.name} />
-          ) : (
-            <CurrentInventoryItem
-              itemId={item.id}
-              itemName={item.name}
-              currentCount={item.currentCount}
-              desiredCount={item.desiredCount}
-              onChangeItemCount={handleItemCountChanged}
-            />
-          )
-        }
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
       />
     </SafeAreaView>
   );

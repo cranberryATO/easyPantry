@@ -40,7 +40,8 @@ export const InventorySettingsItem = React.memo(function InventorySettingsItem({
   itemId,
   itemName,
   itemCount,
-  dragTranslateY,
+  dragTranslationY,
+  dragY,
   onChangeItemName,
   onChangeItemCount,
   onMove,
@@ -51,7 +52,8 @@ export const InventorySettingsItem = React.memo(function InventorySettingsItem({
   itemId: string;
   itemName: string;
   itemCount: number;
-  dragTranslateY: SharedValue<number>;
+  dragTranslationY: SharedValue<number>;
+  dragY: SharedValue<number>;
   onChangeItemName: (itemId: string, newName: string) => void;
   onChangeItemCount: (itemId: string, newCount: number) => void;
   onMove: (itemId: string, direction: "up" | "down") => void;
@@ -62,10 +64,11 @@ export const InventorySettingsItem = React.memo(function InventorySettingsItem({
   const panGesture = Gesture.Pan()
     .minDistance(0)
     .onStart((e) => {
+      dragTranslationY.value = e.y;
       scheduleOnRN(onDragStart, itemId);
     })
     .onUpdate((e) => {
-      dragTranslateY.value = e.translationY;
+      dragY.value = e.absoluteY;
     })
     .onEnd((e) => {
       scheduleOnRN(onDragEnd);
@@ -141,6 +144,7 @@ const styles = StyleSheet.create({
   },
   grip: {
     width: 30,
+    height: 35,
     flexDirection: "row",
     alignItems: "center",
   },

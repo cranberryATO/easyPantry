@@ -4,7 +4,7 @@ import * as Theme from "./theme";
 export const sharedStyles = StyleSheet.create({
   page: {
     flex: 1,
-    padding: 4,
+    paddingHorizontal: 4,
   },
   headerContainer: {
     flexDirection: "row",

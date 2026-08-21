@@ -6,3 +6,4 @@ npx expo install @react-native-async-storage/async-storage
 npx expo install expo-crypto
 
 npm install immer
+npm install react-native-safe-area-context
