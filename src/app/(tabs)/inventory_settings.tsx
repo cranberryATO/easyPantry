@@ -5,30 +5,38 @@ import {
 } from "@/components/InventorySettings";
 import { sharedStyles } from "@/theme/styles";
 import React, { ComponentProps, useCallback, useState } from "react";
-import { StyleSheet } from "react-native";
+import { ReactNativeElement, StyleSheet } from "react-native";
 import Animated, {
+  AnimatedRef,
   clamp,
   DerivedValue,
   measure,
+  scrollTo,
+  SharedValue,
   useAnimatedRef,
-  useAnimatedScrollHandler,
   useAnimatedStyle,
   useDerivedValue,
+  useFrameCallback,
+  useScrollOffset,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const DRAGGABLE_ROW_HEIGHT = 35;
+const SCROLL_VIEW_AUTOSCROLL_AREA_SIZE = 70;
+const SCROLL_VIEW_AUTOSCROLL_SPEED = 1; // scroll units per millisecond
 
 function DraggableItemRow({
   id,
   index,
   draggingItemIndex,
   maxIndex,
+  dragY,
   dragRelativeY,
   dragTranslateY,
   dragCalculatedIndex,
+  scrollViewRef,
   style,
   children,
 }: {
@@ -36,9 +44,11 @@ function DraggableItemRow({
   index: number;
   draggingItemIndex: number;
   maxIndex: number;
+  dragY: SharedValue<number>;
   dragRelativeY: DerivedValue<number>;
   dragTranslateY: DerivedValue<number>;
   dragCalculatedIndex: DerivedValue<number>;
+  scrollViewRef: AnimatedRef<ReactNativeElement>;
   style: ComponentProps<typeof Animated.View>["style"];
   children: React.ReactNode;
 }) {
@@ -131,33 +141,68 @@ export default function InventorySettings() {
 
   const dragTranslateY = useSharedValue<number>(0);
   const dragY = useSharedValue<number>(0);
-  const scrollViewOffsetY = useSharedValue<number>(0);
-  const scrollViewRef = useAnimatedRef();
 
-  // Drag Y value relative to scrollview - does not take scroll
-  // into account
+  const scrollViewRef = useAnimatedRef();
+  const scrollViewOffsetY = useScrollOffset(scrollViewRef);
+
+  // Drag Y value relative to scrollview virtual layout
   const dragRelativeY = useDerivedValue(() => {
-    const scrollViewMeasure = measure(scrollViewRef);
-    const scrollViewMeasureY =
-      scrollViewMeasure != null ? scrollViewMeasure.pageY : 0;
-    console.log(
-      `scrollViewMeasureY=${scrollViewMeasureY}, dragY=${dragY.value}`,
-    );
-    return dragY.value - scrollViewMeasureY + scrollViewOffsetY.value;
+    const _measure = measure(scrollViewRef);
+    const scrollViewPageY = _measure != null ? _measure.pageY : 0;
+    return dragY.value - scrollViewPageY + scrollViewOffsetY.value;
   });
 
   const dragCalculatedIndex = useDerivedValue(() => {
-    const scrollViewMeasure = measure(scrollViewRef);
-    const scrollViewMeasureY =
-      scrollViewMeasure != null ? scrollViewMeasure.pageY : 0;
+    const _measure = measure(scrollViewRef);
+    const scrollViewPageY = _measure != null ? _measure.pageY : 0;
     return Math.max(
       1,
       Math.floor(
-        (dragY.value - scrollViewMeasureY + scrollViewOffsetY.value) /
+        (dragY.value - scrollViewPageY + scrollViewOffsetY.value) /
           DRAGGABLE_ROW_HEIGHT,
       ),
     );
   });
+
+  const frameCallback = useFrameCallback((frameInfo) => {
+    const _measure = measure(scrollViewRef);
+    const scrollViewPageY = _measure != null ? _measure.pageY : 0;
+    const scrollViewHeight = _measure != null ? _measure.height : 100000;
+    const delta_t = frameInfo.timeSincePreviousFrame ?? 0;
+    const dy = Math.max(0, Math.max(0, dragY.value) - scrollViewPageY);
+    console.log(`dy=${dy} dt=${delta_t}`);
+    if (dy < SCROLL_VIEW_AUTOSCROLL_AREA_SIZE) {
+      scrollTo(
+        scrollViewRef,
+        0,
+        Math.max(
+          0,
+          scrollViewOffsetY.value -
+            (SCROLL_VIEW_AUTOSCROLL_SPEED *
+              delta_t *
+              (SCROLL_VIEW_AUTOSCROLL_AREA_SIZE - dy)) /
+              SCROLL_VIEW_AUTOSCROLL_AREA_SIZE,
+        ),
+        false,
+      );
+    }
+    if (dy > scrollViewHeight - SCROLL_VIEW_AUTOSCROLL_AREA_SIZE) {
+      const bottomDistance = scrollViewHeight - dy;
+      scrollTo(
+        scrollViewRef,
+        0,
+        Math.max(
+          0,
+          scrollViewOffsetY.value +
+            (SCROLL_VIEW_AUTOSCROLL_SPEED *
+              delta_t *
+              (SCROLL_VIEW_AUTOSCROLL_AREA_SIZE - bottomDistance)) /
+              SCROLL_VIEW_AUTOSCROLL_AREA_SIZE,
+        ),
+        false,
+      );
+    }
+  }, false); // false = don't autostart
 
   const handleDragStart = useCallback(
     (itemId: string) => {
@@ -167,6 +212,7 @@ export default function InventorySettings() {
           (value) => value.id === itemId,
         ),
       );
+      frameCallback.setActive(true);
     },
     [inventoryContext.inventory.rows],
   );
@@ -179,24 +225,13 @@ export default function InventorySettings() {
     console.log(`Drag End ${draggingItemIndex}->${destInsertIndex}`);
     setDraggingItemIndex(-1);
     inventoryContext.moveItemByIndex(draggingItemIndex, destInsertIndex);
+    frameCallback.setActive(false);
   }, [draggingItemIndex, inventoryContext.inventory.rows]);
-
-  const scrollHandler = useAnimatedScrollHandler(
-    (event) => {
-      const scrollViewMeasureY = measure(scrollViewRef)?.pageY;
-      scrollViewOffsetY.value = event.contentOffset.y;
-      console.log(
-        `pos=${scrollViewMeasureY}, offset=${scrollViewOffsetY.value}`,
-      );
-    },
-    [scrollViewRef],
-  );
 
   return (
     <SafeAreaView style={sharedStyles.page} edges={["right", "top", "left"]}>
       <Animated.ScrollView
         ref={scrollViewRef}
-        onScroll={scrollHandler}
         contentContainerStyle={{
           height: DRAGGABLE_ROW_HEIGHT * inventoryContext.inventory.rows.length,
         }}
@@ -209,9 +244,11 @@ export default function InventorySettings() {
               index={index}
               draggingItemIndex={draggingItemIndex}
               maxIndex={inventoryContext.inventory.rows.length}
+              dragY={dragY}
               dragRelativeY={dragRelativeY}
               dragTranslateY={dragTranslateY}
               dragCalculatedIndex={dragCalculatedIndex}
+              scrollViewRef={scrollViewRef}
               style={sharedStyles.sectionTitleContainer}
             >
               <InventorySettingsSectionHeader
@@ -227,9 +264,11 @@ export default function InventorySettings() {
               index={index}
               draggingItemIndex={draggingItemIndex}
               maxIndex={inventoryContext.inventory.rows.length - 1}
+              dragY={dragY}
               dragRelativeY={dragRelativeY}
               dragTranslateY={dragTranslateY}
               dragCalculatedIndex={dragCalculatedIndex}
+              scrollViewRef={scrollViewRef}
               style={sharedStyles.itemContainer}
             >
               <InventorySettingsItem
