@@ -41,7 +41,7 @@ export default function ShoppingList() {
   );
 
   return (
-    <SafeAreaView style={sharedStyles.page}>
+    <SafeAreaView style={sharedStyles.page} edges={["right", "top", "left"]}>
       <SectionHeader name="📃Ma liste de courses" />
 
       <FlatList

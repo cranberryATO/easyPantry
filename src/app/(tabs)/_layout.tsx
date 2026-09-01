@@ -51,7 +51,7 @@ export default function TabLayout() {
         name="cart"
         options={{
           headerShown: false,
-          title: "Panier",
+          title: "Caddie",
           tabBarIcon: ({ color, focused }) => (
             <MaterialCommunityIcons
               name={focused ? "cart" : "cart-outline"}

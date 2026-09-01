@@ -6,6 +6,7 @@ export const sharedStyles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 4,
     justifyContent: "flex-start",
+    backgroundColor: Theme.COLOR_BACKGROUND,
   },
   headerContainer: {
     flexDirection: "row",

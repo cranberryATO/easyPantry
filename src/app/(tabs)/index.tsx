@@ -38,7 +38,7 @@ export default function CurrentInventory() {
   );
 
   return (
-    <SafeAreaView style={sharedStyles.page}>
+    <SafeAreaView style={sharedStyles.page} edges={["right", "top", "left"]}>
       <FlatList
         data={inventoryContext.inventory.rows}
         keyExtractor={keyExtractor}

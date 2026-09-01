@@ -7,7 +7,7 @@ export const DEFAULT_INVENTORY: Inventory = {
     { type: "section", name: "🛖Réserve", id: Crypto.randomUUID() },
     {
       type: "item",
-      name: "🚽Papier Toilette (pack de 12)",
+      name: "Papier Toilette (pack de 12)",
       desiredCount: 3,
       currentCount: 0,
       id: Crypto.randomUUID(),
@@ -16,7 +16,7 @@ export const DEFAULT_INVENTORY: Inventory = {
     },
     {
       type: "item",
-      name: "⬜Sopalin (pack de 4)",
+      name: "Sopalin (pack de 4)",
       desiredCount: 2,
       currentCount: 0,
       id: Crypto.randomUUID(),
@@ -43,7 +43,7 @@ export const DEFAULT_INVENTORY: Inventory = {
     },
     {
       type: "section",
-      name: "❄️Congélateur",
+      name: "❄️❄️❄️Congélateur",
       id: Crypto.randomUUID(),
       inCartCount: 0,
       orderInShoppingList: 4,
@@ -95,7 +95,7 @@ export const DEFAULT_INVENTORY: Inventory = {
     },
     {
       type: "section",
-      name: "🍅Réfrigérateur",
+      name: "❄️Réfrigérateur",
       id: Crypto.randomUUID(),
     },
     {
@@ -127,7 +127,7 @@ export const DEFAULT_INVENTORY: Inventory = {
     },
     {
       type: "section",
-      name: "🥖Placards",
+      name: "🔪Cuisine",
       id: Crypto.randomUUID(),
     },
     {
@@ -174,6 +174,16 @@ export const DEFAULT_INVENTORY: Inventory = {
       id: Crypto.randomUUID(),
       inCartCount: 0,
       orderInShoppingList: 17,
+    },
+    {
+      type: "section",
+      name: "🚿Salle de bain",
+      id: Crypto.randomUUID(),
+    },
+    {
+      type: "section",
+      name: "✨Extras",
+      id: Crypto.randomUUID(),
     },
   ],
 };

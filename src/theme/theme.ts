@@ -8,7 +8,7 @@ export const COLOR_GRAY_30 = "#b3b3b3";
 export const COLOR_GRAY_20 = "#cccccc";
 export const COLOR_GRAY_10 = "#e5e5e5";
 
-export const COLOR_BACKGROUND = "#cde6cd";
+export const COLOR_BACKGROUND = "#f5f5f5";
 export const COLOR_BUTTON = "#cdd8b6";
 
 export const ICON_BUTTON_SIZE = 24;
@@ -23,3 +23,5 @@ export const ICON_BUTTON_COLOR = COLOR_GRAY_30;
 export const ICON_COUNTER_PLUS = "plus-circle";
 export const ICON_COUNTER_MINUS = "minus-circle";
 export const ICON_COUNTER_COLOR = COLOR_GRAY_30;
+
+export const BORDER_RADIUS = 20;

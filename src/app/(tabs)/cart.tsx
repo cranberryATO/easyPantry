@@ -39,7 +39,7 @@ export default function Cart() {
   );
 
   return (
-    <SafeAreaView style={sharedStyles.page}>
+    <SafeAreaView style={sharedStyles.page} edges={["right", "top", "left"]}>
       <SectionHeader name="🛒 Mon caddie" />
       <FlatList
         data={getShoppingList(inventoryContext.inventory).filter(

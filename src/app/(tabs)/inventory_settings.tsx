@@ -226,6 +226,10 @@ export default function InventorySettings() {
     frameCallback.setActive(false);
   }, [draggingItemIndex, inventoryContext.inventory.rows]);
 
+  const handleAddNewSection = useCallback(() => {
+    inventoryContext.addNewItem("", "");
+  }, [inventoryContext]);
+
   return (
     <SafeAreaView style={sharedStyles.page} edges={["right", "top", "left"]}>
       <Animated.ScrollView
@@ -295,6 +299,13 @@ const styles = StyleSheet.create({
     position: "absolute",
     height: 35,
     width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  newSectionContainer: {
+    position: "absolute",
+    width: "100%",
+    height: 35,
     justifyContent: "center",
     alignItems: "center",
   },
