@@ -5,6 +5,7 @@ import { getShoppingList } from "@/services/inventory";
 import { sharedStyles } from "@/theme/styles";
 import { Tabs } from "expo-router";
 import { View } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 import Animated, {
   LinearTransition,
   SlideOutUp,
@@ -16,29 +17,31 @@ export default function Cart() {
   return (
     <>
       <View style={sharedStyles.page}>
-        {getShoppingList(inventoryContext.inventory)
-          .filter((item) => item.inCartCount > 0)
-          .map((item) => (
-            <Animated.View
-              layout={LinearTransition}
-              exiting={SlideOutUp}
-              key={item.id}
-            >
-              <CartItem
-                itemId={item.id}
-                itemName={item.name}
-                countInCart={item.inCartCount}
-                isFromInventory={true}
-                onAddToCart={(itemId, count) => {
-                  inventoryContext.updateItemCount(
-                    itemId,
-                    "inCartCount",
-                    item.inCartCount + count,
-                  );
-                }}
-              />
-            </Animated.View>
-          ))}
+        <ScrollView>
+          {getShoppingList(inventoryContext.inventory)
+            .filter((item) => item.inCartCount > 0)
+            .map((item) => (
+              <Animated.View
+                layout={LinearTransition}
+                exiting={SlideOutUp}
+                key={item.id}
+              >
+                <CartItem
+                  itemId={item.id}
+                  itemName={item.name}
+                  countInCart={item.inCartCount}
+                  isFromInventory={true}
+                  onAddToCart={(itemId, count) => {
+                    inventoryContext.updateItemCount(
+                      itemId,
+                      "inCartCount",
+                      item.inCartCount + count,
+                    );
+                  }}
+                />
+              </Animated.View>
+            ))}
+        </ScrollView>
       </View>
       <Tabs.Screen
         options={{
