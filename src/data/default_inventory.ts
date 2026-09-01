@@ -45,8 +45,6 @@ export const DEFAULT_INVENTORY: Inventory = {
       type: "section",
       name: "❄️❄️❄️Congélateur",
       id: Crypto.randomUUID(),
-      inCartCount: 0,
-      orderInShoppingList: 4,
     },
     {
       type: "item",
