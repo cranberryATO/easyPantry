@@ -9,7 +9,7 @@ export default function TabLayout() {
         name="inventory_settings"
         options={{
           headerShown: false,
-          title: "Configurer le stock",
+          title: "Objectif",
           tabBarIcon: ({ color, focused }) => (
             <MaterialCommunityIcons
               name={focused ? "store-settings" : "store-settings-outline"}
@@ -41,6 +41,20 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <MaterialCommunityIcons
               name={focused ? "clipboard-list" : "clipboard-list-outline"}
+              color={color}
+              size={24}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="cart"
+        options={{
+          headerShown: false,
+          title: "Panier",
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialCommunityIcons
+              name={focused ? "cart" : "cart-outline"}
               color={color}
               size={24}
             />

@@ -12,6 +12,8 @@ export const COLOR_BACKGROUND = "#cde6cd";
 export const COLOR_BUTTON = "#cdd8b6";
 
 export const ICON_BUTTON_SIZE = 24;
+export const ICON_BUTTON_SIZE_SMALL = 18;
+export const ICON_BUTTON_SIZE_LARGE = 28;
 export const ICON_BUTTON_COLOR = COLOR_GRAY_30;
 
 // export const ICON_COUNTER_PLUS = "plus-circle-outline";

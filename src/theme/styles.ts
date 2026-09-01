@@ -5,6 +5,7 @@ export const sharedStyles = StyleSheet.create({
   page: {
     flex: 1,
     paddingHorizontal: 4,
+    justifyContent: "flex-start",
   },
   headerContainer: {
     flexDirection: "row",

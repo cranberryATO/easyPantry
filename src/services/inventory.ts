@@ -16,6 +16,8 @@ export type InventoryItem = {
   name: string;
   desiredCount: number;
   currentCount: number;
+  inCartCount: number;
+  orderInShoppingList: number;
 };
 
 export type InventoryRow = InventorySection | InventoryItem;
@@ -61,7 +63,7 @@ function findItemIndex(inventory: Inventory, id: string): number {
 export function updateItemCount(
   inventory: Inventory,
   id: string,
-  field: "desiredCount" | "currentCount",
+  field: "desiredCount" | "currentCount" | "inCartCount",
   newCount: number,
 ) {
   const item = findItem(inventory, id);
@@ -148,10 +150,21 @@ export function addNewItem(
       id: Crypto.randomUUID(),
       desiredCount: 1,
       currentCount: 0,
+      inCartCount: 0,
+      orderInShoppingList: 10000,
     });
   }
 }
 
 export function replaceRows(inventory: Inventory, rows: InventoryRow[]) {
   inventory.rows = rows;
+}
+
+export function getShoppingList(inventory: Inventory): InventoryItem[] {
+  return [...inventory.rows]
+    .filter(
+      (row): row is InventoryItem =>
+        row.type === "item" && row.desiredCount > row.currentCount,
+    )
+    .sort((a, b) => a.orderInShoppingList - b.orderInShoppingList);
 }

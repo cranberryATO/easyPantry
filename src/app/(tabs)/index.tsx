@@ -4,10 +4,8 @@ import { FlatList } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import {
-  CurrentInventoryItem,
-  CurrentInventorySectionHeader,
-} from "@/components/CurrentInventory";
+import { CurrentInventoryItem } from "@/components/CurrentInventory";
+import { SectionHeader } from "@/components/SectionHeader";
 import { InventoryRow } from "@/services/inventory";
 import { useCallback } from "react";
 
@@ -26,7 +24,7 @@ export default function CurrentInventory() {
   const renderItem = useCallback(
     ({ item }: { item: InventoryRow }) =>
       item.type === "section" ? (
-        <CurrentInventorySectionHeader id={item.id} name={item.name} />
+        <SectionHeader name={item.name} />
       ) : (
         <CurrentInventoryItem
           itemId={item.id}

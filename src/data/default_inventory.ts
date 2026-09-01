@@ -11,6 +11,8 @@ export const DEFAULT_INVENTORY: Inventory = {
       desiredCount: 3,
       currentCount: 0,
       id: Crypto.randomUUID(),
+      inCartCount: 0,
+      orderInShoppingList: 0,
     },
     {
       type: "item",
@@ -18,6 +20,8 @@ export const DEFAULT_INVENTORY: Inventory = {
       desiredCount: 2,
       currentCount: 0,
       id: Crypto.randomUUID(),
+      inCartCount: 0,
+      orderInShoppingList: 1,
     },
     {
       type: "item",
@@ -25,6 +29,8 @@ export const DEFAULT_INVENTORY: Inventory = {
       desiredCount: 1,
       currentCount: 0,
       id: Crypto.randomUUID(),
+      inCartCount: 0,
+      orderInShoppingList: 2,
     },
     {
       type: "item",
@@ -32,11 +38,15 @@ export const DEFAULT_INVENTORY: Inventory = {
       desiredCount: 1,
       currentCount: 0,
       id: Crypto.randomUUID(),
+      inCartCount: 0,
+      orderInShoppingList: 3,
     },
     {
       type: "section",
       name: "❄️Congélateur",
       id: Crypto.randomUUID(),
+      inCartCount: 0,
+      orderInShoppingList: 4,
     },
     {
       type: "item",
@@ -44,6 +54,8 @@ export const DEFAULT_INVENTORY: Inventory = {
       desiredCount: 5,
       currentCount: 0,
       id: Crypto.randomUUID(),
+      inCartCount: 0,
+      orderInShoppingList: 5,
     },
     {
       type: "item",
@@ -51,6 +63,8 @@ export const DEFAULT_INVENTORY: Inventory = {
       desiredCount: 2,
       currentCount: 0,
       id: Crypto.randomUUID(),
+      inCartCount: 0,
+      orderInShoppingList: 6,
     },
     {
       type: "item",
@@ -58,6 +72,8 @@ export const DEFAULT_INVENTORY: Inventory = {
       desiredCount: 3,
       currentCount: 0,
       id: Crypto.randomUUID(),
+      inCartCount: 0,
+      orderInShoppingList: 7,
     },
     {
       type: "item",
@@ -65,6 +81,8 @@ export const DEFAULT_INVENTORY: Inventory = {
       desiredCount: 2,
       currentCount: 0,
       id: Crypto.randomUUID(),
+      inCartCount: 0,
+      orderInShoppingList: 8,
     },
     {
       type: "item",
@@ -72,6 +90,8 @@ export const DEFAULT_INVENTORY: Inventory = {
       desiredCount: 2,
       currentCount: 0,
       id: Crypto.randomUUID(),
+      inCartCount: 0,
+      orderInShoppingList: 9,
     },
     {
       type: "section",
@@ -84,6 +104,8 @@ export const DEFAULT_INVENTORY: Inventory = {
       desiredCount: 1,
       currentCount: 0,
       id: Crypto.randomUUID(),
+      inCartCount: 0,
+      orderInShoppingList: 10,
     },
     {
       type: "item",
@@ -91,6 +113,8 @@ export const DEFAULT_INVENTORY: Inventory = {
       desiredCount: 1,
       currentCount: 0,
       id: Crypto.randomUUID(),
+      inCartCount: 0,
+      orderInShoppingList: 11,
     },
     {
       type: "item",
@@ -98,6 +122,8 @@ export const DEFAULT_INVENTORY: Inventory = {
       desiredCount: 1,
       currentCount: 0,
       id: Crypto.randomUUID(),
+      inCartCount: 0,
+      orderInShoppingList: 12,
     },
     {
       type: "section",
@@ -110,6 +136,8 @@ export const DEFAULT_INVENTORY: Inventory = {
       desiredCount: 1,
       currentCount: 0,
       id: Crypto.randomUUID(),
+      inCartCount: 0,
+      orderInShoppingList: 13,
     },
     {
       type: "item",
@@ -117,6 +145,8 @@ export const DEFAULT_INVENTORY: Inventory = {
       desiredCount: 2,
       currentCount: 0,
       id: Crypto.randomUUID(),
+      inCartCount: 0,
+      orderInShoppingList: 14,
     },
     {
       type: "item",
@@ -124,6 +154,8 @@ export const DEFAULT_INVENTORY: Inventory = {
       desiredCount: 1,
       currentCount: 0,
       id: Crypto.randomUUID(),
+      inCartCount: 0,
+      orderInShoppingList: 15,
     },
     {
       type: "item",
@@ -131,6 +163,8 @@ export const DEFAULT_INVENTORY: Inventory = {
       desiredCount: 1,
       currentCount: 0,
       id: Crypto.randomUUID(),
+      inCartCount: 0,
+      orderInShoppingList: 16,
     },
     {
       type: "item",
@@ -138,6 +172,8 @@ export const DEFAULT_INVENTORY: Inventory = {
       desiredCount: 1,
       currentCount: 0,
       id: Crypto.randomUUID(),
+      inCartCount: 0,
+      orderInShoppingList: 17,
     },
   ],
 };

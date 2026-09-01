@@ -22,9 +22,10 @@ export const InventorySettingsSectionHeader = React.memo(
     return (
       <>
         <View style={styles.line}></View>
-        <Text style={sharedStyles.sectionTitle}>{name}</Text>
+        <Text style={[sharedStyles.sectionTitle, { marginRight: 10 }]}>
+          {name}
+        </Text>
         <IconButton
-          style={{ marginLeft: 10 }}
           icon={Theme.ICON_COUNTER_PLUS}
           onPress={() => {
             onAddNewItem(id);

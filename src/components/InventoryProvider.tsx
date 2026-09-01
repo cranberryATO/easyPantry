@@ -14,7 +14,7 @@ type InventoryContextValue = {
   inventory: Inventory.Inventory;
   updateItemCount: (
     itemId: string,
-    field: "desiredCount" | "currentCount",
+    field: "desiredCount" | "currentCount" | "inCartCount",
     newCount: number,
   ) => void;
   renameItem: (itemId: string, newName: string) => void;
@@ -73,7 +73,7 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
   const updateItemCount = useCallback(
     (
       itemId: string,
-      field: "desiredCount" | "currentCount",
+      field: "desiredCount" | "currentCount" | "inCartCount",
       newCount: number,
     ) => {
       setInventory((prev) =>

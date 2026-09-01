@@ -8,17 +8,39 @@ export function IconButton({
   onPress = () => {},
   onPressIn = () => {},
   disabled,
+  size = Theme.ICON_BUTTON_SIZE,
 }: {
   icon: ComponentProps<typeof MaterialCommunityIcons>["name"];
   style?: any;
   onPress?: () => void;
   onPressIn?: () => void;
   disabled?: boolean;
+  size?: number;
 }) {
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          alignSelf: "center",
+          width: size,
+          height: size,
+          justifyContent: "center",
+          alignItems: "center",
+        },
+      ]}
+    >
       <Pressable
-        style={[style]}
+        style={[
+          style,
+          {
+            alignSelf: "center",
+            width: size,
+            height: size,
+            justifyContent: "center",
+            alignItems: "center",
+          },
+        ]}
         onPress={onPress}
         onPressIn={onPressIn}
         disabled={disabled}
@@ -26,7 +48,7 @@ export function IconButton({
       >
         <MaterialCommunityIcons
           name={icon}
-          size={Theme.ICON_BUTTON_SIZE}
+          size={size}
           color={Theme.ICON_BUTTON_COLOR}
         />
       </Pressable>
@@ -40,5 +62,7 @@ const styles = StyleSheet.create({
     borderRadius: 1000,
     overflow: "hidden",
     alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "center",
   },
 });

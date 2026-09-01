@@ -1,8 +1,6 @@
 import { useInventory } from "@/components/InventoryProvider";
-import {
-  InventorySettingsItem,
-  InventorySettingsSectionHeader,
-} from "@/components/InventorySettings";
+import { InventorySettingsItem } from "@/components/InventorySettings";
+import { SectionHeader } from "@/components/SectionHeader";
 import { sharedStyles } from "@/theme/styles";
 import React, { ComponentProps, useCallback, useState } from "react";
 import { ReactNativeElement, StyleSheet } from "react-native";
@@ -251,7 +249,7 @@ export default function InventorySettings() {
               scrollViewRef={scrollViewRef}
               style={sharedStyles.sectionTitleContainer}
             >
-              <InventorySettingsSectionHeader
+              <SectionHeader
                 id={row.id}
                 name={row.name}
                 onAddNewItem={handleAddNewItemToSection}

@@ -1,6 +1,6 @@
+import { CartItem } from "@/components/Cart";
 import { useInventory } from "@/components/InventoryProvider";
 import { SectionHeader } from "@/components/SectionHeader";
-import { ShoppingListItem } from "@/components/ShoppingList";
 import {
   getShoppingList,
   InventoryItem,
@@ -12,7 +12,7 @@ import { FlatList } from "react-native";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function ShoppingList() {
+export default function Cart() {
   const inventoryContext = useInventory();
 
   const keyExtractor = useCallback((row: InventoryRow) => row.id, []);
@@ -20,10 +20,9 @@ export default function ShoppingList() {
   const renderItem = useCallback(
     ({ item }: { item: InventoryItem }) => (
       <Animated.View layout={LinearTransition}>
-        <ShoppingListItem
+        <CartItem
           itemId={item.id}
           itemName={item.name}
-          countInList={item.desiredCount - item.currentCount}
           countInCart={item.inCartCount}
           isFromInventory={true}
           onAddToCart={(itemId, count) => {
@@ -33,7 +32,6 @@ export default function ShoppingList() {
               item.inCartCount + count,
             );
           }}
-          onRemoveFromList={() => {}}
         />
       </Animated.View>
     ),
@@ -42,11 +40,10 @@ export default function ShoppingList() {
 
   return (
     <SafeAreaView style={sharedStyles.page}>
-      <SectionHeader name="📃Ma liste de courses" />
-
+      <SectionHeader name="🛒 Mon caddie" />
       <FlatList
         data={getShoppingList(inventoryContext.inventory).filter(
-          (item) => item.desiredCount > item.currentCount + item.inCartCount,
+          (item) => item.inCartCount > 0,
         )}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
@@ -60,5 +57,6 @@ const styles = {
     width: "30%",
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
   },
 };
