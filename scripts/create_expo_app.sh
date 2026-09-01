@@ -7,3 +7,4 @@ npx expo install expo-crypto
 
 npm install immer
 npm install react-native-safe-area-context
+npm install react-native-keyboard-controller

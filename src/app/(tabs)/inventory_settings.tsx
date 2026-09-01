@@ -4,6 +4,9 @@ import { SectionHeader } from "@/components/SectionHeader";
 import { sharedStyles } from "@/theme/styles";
 import React, { ComponentProps, useCallback, useState } from "react";
 import { ReactNativeElement, StyleSheet } from "react-native";
+import { useReanimatedKeyboardAnimation } from "react-native-keyboard-controller";
+
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import Animated, {
   AnimatedRef,
   clamp,
@@ -11,6 +14,7 @@ import Animated, {
   measure,
   scrollTo,
   SharedValue,
+  useAnimatedReaction,
   useAnimatedRef,
   useAnimatedStyle,
   useDerivedValue,
@@ -230,66 +234,99 @@ export default function InventorySettings() {
     inventoryContext.addNewItem("", "");
   }, [inventoryContext]);
 
+  // if selected input is hidden by keyboard, scroll to it
+  const { height, progress } = useReanimatedKeyboardAnimation();
+  const [focusedItemIndex, setFocusedItemIndex] = useState<number>(0);
+
+  useAnimatedReaction(
+    () => {
+      return height.value;
+    },
+    (currentValue, previousValue) => {
+      const _measure = measure(scrollViewRef);
+      const focusedItemY = focusedItemIndex * DRAGGABLE_ROW_HEIGHT;
+      const focusedItemBottomY = (focusedItemIndex + 1) * DRAGGABLE_ROW_HEIGHT;
+      if (
+        _measure != null &&
+        focusedItemBottomY > _measure.height + scrollViewOffsetY.value
+      ) {
+        console.log(
+          `Scrolling to focused input ${scrollViewOffsetY.value - 10}`,
+        );
+        scrollTo(scrollViewRef, 0, focusedItemBottomY - _measure.height, true);
+      }
+      console.log(
+        `Keyboard height=${currentValue} ScrollView height=${_measure?.height} ScroolPos=${scrollViewOffsetY.value} FocusedY=${focusedItemY}`,
+      );
+    },
+  );
+
   return (
     <SafeAreaView style={sharedStyles.page} edges={["right", "top", "left"]}>
-      <Animated.ScrollView
-        ref={scrollViewRef}
-        contentContainerStyle={{
-          height: DRAGGABLE_ROW_HEIGHT * inventoryContext.inventory.rows.length,
-        }}
-      >
-        {inventoryContext.inventory.rows.map((row, index) =>
-          row.type === "section" ? (
-            <DraggableItemRow
-              key={row.id}
-              id={row.id}
-              index={index}
-              draggingItemIndex={draggingItemIndex}
-              maxIndex={inventoryContext.inventory.rows.length}
-              dragY={dragY}
-              dragRelativeY={dragRelativeY}
-              dragTranslateY={dragTranslateY}
-              dragCalculatedIndex={dragCalculatedIndex}
-              scrollViewRef={scrollViewRef}
-              style={sharedStyles.sectionTitleContainer}
-            >
-              <SectionHeader
+      <KeyboardAvoidingView behavior={"padding"}>
+        <Animated.ScrollView
+          ref={scrollViewRef}
+          contentContainerStyle={{
+            height:
+              DRAGGABLE_ROW_HEIGHT * inventoryContext.inventory.rows.length,
+          }}
+        >
+          {inventoryContext.inventory.rows.map((row, index) =>
+            row.type === "section" ? (
+              <DraggableItemRow
+                key={row.id}
                 id={row.id}
-                name={row.name}
-                onAddNewItem={handleAddNewItemToSection}
-              />
-            </DraggableItemRow>
-          ) : (
-            <DraggableItemRow
-              key={row.id}
-              id={row.id}
-              index={index}
-              draggingItemIndex={draggingItemIndex}
-              maxIndex={inventoryContext.inventory.rows.length - 1}
-              dragY={dragY}
-              dragRelativeY={dragRelativeY}
-              dragTranslateY={dragTranslateY}
-              dragCalculatedIndex={dragCalculatedIndex}
-              scrollViewRef={scrollViewRef}
-              style={sharedStyles.itemContainer}
-            >
-              <InventorySettingsItem
-                itemId={row.id}
-                itemName={row.name}
-                itemCount={row.desiredCount}
-                onChangeItemCount={handleItemCountChanged}
-                onChangeItemName={handleItemNameChanged}
-                onMove={handleMoveItem}
-                onRemove={handleRemoveItem}
-                onDragStart={handleDragStart}
-                onDragEnd={handleDragEnd}
-                dragTranslationY={dragTranslateY}
+                index={index}
+                draggingItemIndex={draggingItemIndex}
+                maxIndex={inventoryContext.inventory.rows.length}
                 dragY={dragY}
-              />
-            </DraggableItemRow>
-          ),
-        )}
-      </Animated.ScrollView>
+                dragRelativeY={dragRelativeY}
+                dragTranslateY={dragTranslateY}
+                dragCalculatedIndex={dragCalculatedIndex}
+                scrollViewRef={scrollViewRef}
+                style={sharedStyles.sectionTitleContainer}
+              >
+                <SectionHeader
+                  id={row.id}
+                  name={row.name}
+                  onAddNewItem={handleAddNewItemToSection}
+                />
+              </DraggableItemRow>
+            ) : (
+              <DraggableItemRow
+                key={row.id}
+                id={row.id}
+                index={index}
+                draggingItemIndex={draggingItemIndex}
+                maxIndex={inventoryContext.inventory.rows.length - 1}
+                dragY={dragY}
+                dragRelativeY={dragRelativeY}
+                dragTranslateY={dragTranslateY}
+                dragCalculatedIndex={dragCalculatedIndex}
+                scrollViewRef={scrollViewRef}
+                style={sharedStyles.itemContainer}
+              >
+                <InventorySettingsItem
+                  itemId={row.id}
+                  itemName={row.name}
+                  itemCount={row.desiredCount}
+                  onChangeItemCount={handleItemCountChanged}
+                  onChangeItemName={handleItemNameChanged}
+                  onMove={handleMoveItem}
+                  onRemove={handleRemoveItem}
+                  onDragStart={handleDragStart}
+                  onDragEnd={handleDragEnd}
+                  dragTranslationY={dragTranslateY}
+                  dragY={dragY}
+                  onFocus={() => {
+                    setFocusedItemIndex(index);
+                  }}
+                />
+              </DraggableItemRow>
+            ),
+          )}
+        </Animated.ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
