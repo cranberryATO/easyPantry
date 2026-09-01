@@ -1,10 +1,16 @@
+import * as Theme from "@/theme/theme";
 import { Tabs } from "expo-router";
 
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 export default function TabLayout() {
   return (
-    <Tabs>
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: Theme.COLOR_GRAY_60,
+        tabBarInactiveTintColor: Theme.COLOR_GRAY_30,
+      }}
+    >
       <Tabs.Screen
         name="inventory_settings"
         options={{

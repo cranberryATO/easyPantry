@@ -49,7 +49,6 @@ export const InventorySettingsItem = React.memo(function InventorySettingsItem({
   onRemove,
   onDragStart,
   onDragEnd,
-  onFocus,
 }: {
   itemId: string;
   itemName: string;
@@ -62,7 +61,6 @@ export const InventorySettingsItem = React.memo(function InventorySettingsItem({
   onRemove: (itemId: string) => void;
   onDragStart: (itemId: string) => void;
   onDragEnd: () => void;
-  onFocus: (itemId: string) => void;
 }) {
   const panGesture = Gesture.Pan()
     .minDistance(0)
@@ -93,9 +91,6 @@ export const InventorySettingsItem = React.memo(function InventorySettingsItem({
         value={itemName}
         onChangeText={(value) => {
           onChangeItemName(itemId, value);
-        }}
-        onFocus={() => {
-          onFocus(itemId);
         }}
         placeholder=""
       />

@@ -4,7 +4,6 @@ import { SectionHeader } from "@/components/SectionHeader";
 import { sharedStyles } from "@/theme/styles";
 import React, { ComponentProps, useCallback, useState } from "react";
 import { ReactNativeElement, StyleSheet } from "react-native";
-import { useReanimatedKeyboardAnimation } from "react-native-keyboard-controller";
 
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import Animated, {
@@ -14,7 +13,6 @@ import Animated, {
   measure,
   scrollTo,
   SharedValue,
-  useAnimatedReaction,
   useAnimatedRef,
   useAnimatedStyle,
   useDerivedValue,
@@ -63,13 +61,14 @@ function DraggableItemRow({
       return {
         transform: [
           {
-            translateY: clamp(
-              dragRelativeY.value - dragTranslateY.value,
-              DRAGGABLE_ROW_HEIGHT,
-              maxIndex * DRAGGABLE_ROW_HEIGHT,
-            ),
+            translateY: 0,
           },
         ],
+        top: clamp(
+          dragRelativeY.value - dragTranslateY.value,
+          DRAGGABLE_ROW_HEIGHT,
+          maxIndex * DRAGGABLE_ROW_HEIGHT,
+        ),
       };
     }
 
@@ -86,22 +85,17 @@ function DraggableItemRow({
     return {
       transform: [
         {
-          translateY: withTiming((index + shift) * DRAGGABLE_ROW_HEIGHT, {
-            duration: 200,
-          }),
-        },
-        {
-          translateX: withTiming(0, { duration: 200 }),
+          translateY: 0,
         },
       ],
+      top: withTiming((index + shift) * DRAGGABLE_ROW_HEIGHT, {
+        duration: 200,
+      }),
     };
   }, [index, draggingItemIndex]);
 
   return (
-    <Animated.View
-      key={id}
-      style={[styles.draggableItemRow, style, animatedStyle]}
-    >
+    <Animated.View style={[styles.draggableItemRow, style, animatedStyle]}>
       {children}
     </Animated.View>
   );
@@ -234,33 +228,6 @@ export default function InventorySettings() {
     inventoryContext.addNewItem("", "");
   }, [inventoryContext]);
 
-  // if selected input is hidden by keyboard, scroll to it
-  const { height, progress } = useReanimatedKeyboardAnimation();
-  const [focusedItemIndex, setFocusedItemIndex] = useState<number>(0);
-
-  useAnimatedReaction(
-    () => {
-      return height.value;
-    },
-    (currentValue, previousValue) => {
-      const _measure = measure(scrollViewRef);
-      const focusedItemY = focusedItemIndex * DRAGGABLE_ROW_HEIGHT;
-      const focusedItemBottomY = (focusedItemIndex + 1) * DRAGGABLE_ROW_HEIGHT;
-      if (
-        _measure != null &&
-        focusedItemBottomY > _measure.height + scrollViewOffsetY.value
-      ) {
-        console.log(
-          `Scrolling to focused input ${scrollViewOffsetY.value - 10}`,
-        );
-        scrollTo(scrollViewRef, 0, focusedItemBottomY - _measure.height, true);
-      }
-      console.log(
-        `Keyboard height=${currentValue} ScrollView height=${_measure?.height} ScroolPos=${scrollViewOffsetY.value} FocusedY=${focusedItemY}`,
-      );
-    },
-  );
-
   return (
     <SafeAreaView style={sharedStyles.page} edges={["right", "top", "left"]}>
       <KeyboardAvoidingView behavior={"padding"}>
@@ -318,9 +285,6 @@ export default function InventorySettings() {
                   onDragEnd={handleDragEnd}
                   dragTranslationY={dragTranslateY}
                   dragY={dragY}
-                  onFocus={() => {
-                    setFocusedItemIndex(index);
-                  }}
                 />
               </DraggableItemRow>
             ),
