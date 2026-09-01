@@ -43,7 +43,7 @@ export const ShoppingListItem = memo(function ShoppingListItem({
             <Text style={styles.cartText}>{countInCart}</Text>
           </View>
           <IconButton icon="cart-plus" onPress={() => onAddToCart(itemId, 1)} />
-          <Text>{displayedCount}</Text>
+          <Text style={sharedStyles.countText}>{displayedCount}</Text>
           <IconButton
             icon="cart-check"
             onPress={() => onAddToCart(itemId, displayedCount)}
@@ -60,6 +60,7 @@ const styles = StyleSheet.create({
     width: 150,
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
   },
   cartContainer: {
     position: "relative",
@@ -73,9 +74,8 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     fontSize: 16,
-    alignItems: "center",
     textAlign: "center",
-    justifyContent: "center",
+    lineHeight: 25,
     color: Theme.COLOR_GRAY_80,
     fontWeight: "bold",
   },

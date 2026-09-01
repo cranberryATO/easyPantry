@@ -2,6 +2,7 @@ import { useInventory } from "@/components/InventoryProvider";
 import { InventorySettingsItem } from "@/components/InventorySettings";
 import { SectionHeader } from "@/components/SectionHeader";
 import { sharedStyles } from "@/theme/styles";
+import { useHeaderHeight } from "expo-router/build/react-navigation";
 import React, { ComponentProps, useCallback, useState } from "react";
 import { ReactNativeElement, StyleSheet } from "react-native";
 
@@ -21,7 +22,6 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const DRAGGABLE_ROW_HEIGHT = 35;
 const SCROLL_VIEW_AUTOSCROLL_AREA_SIZE = 70;
@@ -228,70 +228,73 @@ export default function InventorySettings() {
     inventoryContext.addNewItem("", "");
   }, [inventoryContext]);
 
+  const headerHeight = useHeaderHeight();
+
   return (
-    <SafeAreaView style={sharedStyles.page} edges={["right", "top", "left"]}>
-      <KeyboardAvoidingView behavior={"padding"}>
-        <Animated.ScrollView
-          ref={scrollViewRef}
-          contentContainerStyle={{
-            height:
-              DRAGGABLE_ROW_HEIGHT * inventoryContext.inventory.rows.length,
-          }}
-        >
-          {inventoryContext.inventory.rows.map((row, index) =>
-            row.type === "section" ? (
-              <DraggableItemRow
-                key={row.id}
+    <KeyboardAvoidingView
+      style={sharedStyles.page}
+      behavior={"padding"}
+      keyboardVerticalOffset={headerHeight}
+    >
+      <Animated.ScrollView
+        ref={scrollViewRef}
+        contentContainerStyle={{
+          height: DRAGGABLE_ROW_HEIGHT * inventoryContext.inventory.rows.length,
+        }}
+      >
+        {inventoryContext.inventory.rows.map((row, index) =>
+          row.type === "section" ? (
+            <DraggableItemRow
+              key={row.id}
+              id={row.id}
+              index={index}
+              draggingItemIndex={draggingItemIndex}
+              maxIndex={inventoryContext.inventory.rows.length}
+              dragY={dragY}
+              dragRelativeY={dragRelativeY}
+              dragTranslateY={dragTranslateY}
+              dragCalculatedIndex={dragCalculatedIndex}
+              scrollViewRef={scrollViewRef}
+              style={sharedStyles.sectionTitleContainer}
+            >
+              <SectionHeader
                 id={row.id}
-                index={index}
-                draggingItemIndex={draggingItemIndex}
-                maxIndex={inventoryContext.inventory.rows.length}
+                name={row.name}
+                onAddNewItem={handleAddNewItemToSection}
+              />
+            </DraggableItemRow>
+          ) : (
+            <DraggableItemRow
+              key={row.id}
+              id={row.id}
+              index={index}
+              draggingItemIndex={draggingItemIndex}
+              maxIndex={inventoryContext.inventory.rows.length - 1}
+              dragY={dragY}
+              dragRelativeY={dragRelativeY}
+              dragTranslateY={dragTranslateY}
+              dragCalculatedIndex={dragCalculatedIndex}
+              scrollViewRef={scrollViewRef}
+              style={sharedStyles.itemContainer}
+            >
+              <InventorySettingsItem
+                itemId={row.id}
+                itemName={row.name}
+                itemCount={row.desiredCount}
+                onChangeItemCount={handleItemCountChanged}
+                onChangeItemName={handleItemNameChanged}
+                onMove={handleMoveItem}
+                onRemove={handleRemoveItem}
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
+                dragTranslationY={dragTranslateY}
                 dragY={dragY}
-                dragRelativeY={dragRelativeY}
-                dragTranslateY={dragTranslateY}
-                dragCalculatedIndex={dragCalculatedIndex}
-                scrollViewRef={scrollViewRef}
-                style={sharedStyles.sectionTitleContainer}
-              >
-                <SectionHeader
-                  id={row.id}
-                  name={row.name}
-                  onAddNewItem={handleAddNewItemToSection}
-                />
-              </DraggableItemRow>
-            ) : (
-              <DraggableItemRow
-                key={row.id}
-                id={row.id}
-                index={index}
-                draggingItemIndex={draggingItemIndex}
-                maxIndex={inventoryContext.inventory.rows.length - 1}
-                dragY={dragY}
-                dragRelativeY={dragRelativeY}
-                dragTranslateY={dragTranslateY}
-                dragCalculatedIndex={dragCalculatedIndex}
-                scrollViewRef={scrollViewRef}
-                style={sharedStyles.itemContainer}
-              >
-                <InventorySettingsItem
-                  itemId={row.id}
-                  itemName={row.name}
-                  itemCount={row.desiredCount}
-                  onChangeItemCount={handleItemCountChanged}
-                  onChangeItemName={handleItemNameChanged}
-                  onMove={handleMoveItem}
-                  onRemove={handleRemoveItem}
-                  onDragStart={handleDragStart}
-                  onDragEnd={handleDragEnd}
-                  dragTranslationY={dragTranslateY}
-                  dragY={dragY}
-                />
-              </DraggableItemRow>
-            ),
-          )}
-        </Animated.ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+              />
+            </DraggableItemRow>
+          ),
+        )}
+      </Animated.ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 

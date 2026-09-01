@@ -18,29 +18,9 @@ export function IconButton({
   size?: number;
 }) {
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          alignSelf: "center",
-          width: size,
-          height: size,
-          justifyContent: "center",
-          alignItems: "center",
-        },
-      ]}
-    >
+    <View style={[styles.container]}>
       <Pressable
-        style={[
-          style,
-          {
-            alignSelf: "center",
-            width: size,
-            height: size,
-            justifyContent: "center",
-            alignItems: "center",
-          },
-        ]}
+        style={[style]}
         onPress={onPress}
         onPressIn={onPressIn}
         disabled={disabled}

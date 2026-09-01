@@ -94,4 +94,10 @@ export const sharedStyles = StyleSheet.create({
     justifyContent: "center",
   },
   disabledButton: {},
+  countText: {
+    lineHeight: 22,
+    fontSize: 16,
+    textAlign: "center",
+    alignSelf: "center",
+  },
 });

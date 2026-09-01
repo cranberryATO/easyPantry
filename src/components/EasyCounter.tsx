@@ -1,7 +1,7 @@
 import { IconButton } from "@/components/IconButton";
 import { sharedStyles } from "@/theme/styles";
 import * as Theme from "@/theme/theme";
-import { StyleSheet, Text } from "react-native";
+import { Text } from "react-native";
 
 export function EasyCounter({
   count,
@@ -34,7 +34,7 @@ export function EasyCounter({
         disabled={!enabled}
         icon={leftIcon}
       />
-      <Text style={[styles.countText, { width: total > 0 ? 40 : 20 }]}>
+      <Text style={[sharedStyles.countText, { width: total > 0 ? 40 : 20 }]}>
         {count}
         {total > 0 && "/" + total}
       </Text>
@@ -50,11 +50,3 @@ export function EasyCounter({
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  countText: {
-    lineHeight: 22,
-    textAlign: "center",
-    alignSelf: "center",
-  },
-});

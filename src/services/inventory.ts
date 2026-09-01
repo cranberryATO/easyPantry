@@ -168,3 +168,12 @@ export function getShoppingList(inventory: Inventory): InventoryItem[] {
     )
     .sort((a, b) => a.orderInShoppingList - b.orderInShoppingList);
 }
+
+export function addAllCartItemsToInventory(inventory: Inventory) {
+  for (const row of inventory.rows) {
+    if (row.type === "item") {
+      row.currentCount += row.inCartCount;
+      row.inCartCount = 0;
+    }
+  }
+}

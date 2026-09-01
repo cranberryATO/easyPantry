@@ -1,8 +1,6 @@
 import { useInventory } from "@/components/InventoryProvider";
 import { sharedStyles } from "@/theme/styles";
-import { FlatList } from "react-native";
-
-import { SafeAreaView } from "react-native-safe-area-context";
+import { FlatList, View } from "react-native";
 
 import { CurrentInventoryItem } from "@/components/CurrentInventory";
 import { SectionHeader } from "@/components/SectionHeader";
@@ -38,12 +36,12 @@ export default function CurrentInventory() {
   );
 
   return (
-    <SafeAreaView style={sharedStyles.page} edges={["right", "top", "left"]}>
+    <View style={sharedStyles.page}>
       <FlatList
         data={inventoryContext.inventory.rows}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
       />
-    </SafeAreaView>
+    </View>
   );
 }

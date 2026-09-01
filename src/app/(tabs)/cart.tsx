@@ -1,54 +1,58 @@
 import { CartItem } from "@/components/Cart";
+import { IconButton } from "@/components/IconButton";
 import { useInventory } from "@/components/InventoryProvider";
-import { SectionHeader } from "@/components/SectionHeader";
-import {
-  getShoppingList,
-  InventoryItem,
-  InventoryRow,
-} from "@/services/inventory";
+import { getShoppingList } from "@/services/inventory";
 import { sharedStyles } from "@/theme/styles";
-import { useCallback } from "react";
-import { FlatList } from "react-native";
-import Animated, { LinearTransition } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Tabs } from "expo-router";
+import { View } from "react-native";
+import Animated, {
+  LinearTransition,
+  SlideOutUp,
+} from "react-native-reanimated";
 
 export default function Cart() {
   const inventoryContext = useInventory();
 
-  const keyExtractor = useCallback((row: InventoryRow) => row.id, []);
-
-  const renderItem = useCallback(
-    ({ item }: { item: InventoryItem }) => (
-      <Animated.View layout={LinearTransition}>
-        <CartItem
-          itemId={item.id}
-          itemName={item.name}
-          countInCart={item.inCartCount}
-          isFromInventory={true}
-          onAddToCart={(itemId, count) => {
-            inventoryContext.updateItemCount(
-              itemId,
-              "inCartCount",
-              item.inCartCount + count,
-            );
-          }}
-        />
-      </Animated.View>
-    ),
-    [],
-  );
-
   return (
-    <SafeAreaView style={sharedStyles.page} edges={["right", "top", "left"]}>
-      <SectionHeader name="🛒 Mon caddie" />
-      <FlatList
-        data={getShoppingList(inventoryContext.inventory).filter(
-          (item) => item.inCartCount > 0,
-        )}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
+    <>
+      <View style={sharedStyles.page}>
+        {getShoppingList(inventoryContext.inventory)
+          .filter((item) => item.inCartCount > 0)
+          .map((item) => (
+            <Animated.View
+              layout={LinearTransition}
+              exiting={SlideOutUp}
+              key={item.id}
+            >
+              <CartItem
+                itemId={item.id}
+                itemName={item.name}
+                countInCart={item.inCartCount}
+                isFromInventory={true}
+                onAddToCart={(itemId, count) => {
+                  inventoryContext.updateItemCount(
+                    itemId,
+                    "inCartCount",
+                    item.inCartCount + count,
+                  );
+                }}
+              />
+            </Animated.View>
+          ))}
+      </View>
+      <Tabs.Screen
+        options={{
+          headerRight: () => (
+            <IconButton
+              icon="cart-arrow-up"
+              size={30}
+              onPress={inventoryContext.addAllCartItemsToInventory}
+              style={{ marginRight: 10 }}
+            />
+          ),
+        }}
       />
-    </SafeAreaView>
+    </>
   );
 }
 
