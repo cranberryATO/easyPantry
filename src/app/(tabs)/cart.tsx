@@ -8,7 +8,7 @@ import { View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import Animated, {
   LinearTransition,
-  SlideOutUp,
+  SlideOutLeft,
 } from "react-native-reanimated";
 
 export default function Cart() {
@@ -23,7 +23,7 @@ export default function Cart() {
             .map((item) => (
               <Animated.View
                 layout={LinearTransition}
-                exiting={SlideOutUp}
+                exiting={SlideOutLeft}
                 key={item.id}
               >
                 <CartItem

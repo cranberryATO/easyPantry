@@ -1,6 +1,6 @@
 import { useInventory } from "@/components/InventoryProvider";
 import { sharedStyles } from "@/theme/styles";
-import { FlatList, View } from "react-native";
+import { ScrollView, View } from "react-native";
 
 import { CurrentInventoryItem } from "@/components/CurrentInventory";
 import { SectionHeader } from "@/components/SectionHeader";
@@ -37,11 +37,22 @@ export default function CurrentInventory() {
 
   return (
     <View style={sharedStyles.page}>
-      <FlatList
-        data={inventoryContext.inventory.rows}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-      />
+      <ScrollView>
+        {inventoryContext.inventory.rows.map((item) =>
+          item.type === "section" ? (
+            <SectionHeader name={item.name} key={item.id} />
+          ) : (
+            <CurrentInventoryItem
+              key={item.id}
+              itemId={item.id}
+              itemName={item.name}
+              currentCount={item.currentCount}
+              desiredCount={item.desiredCount}
+              onChangeItemCount={handleItemCountChanged}
+            />
+          ),
+        )}
+      </ScrollView>
     </View>
   );
 }

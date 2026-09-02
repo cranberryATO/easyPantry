@@ -14,11 +14,11 @@ export default function TabLayout() {
       <Tabs.Screen
         name="inventory_settings"
         options={{
-          title: "Objectif",
+          title: "Configuration",
           headerTitle: "⚙️ Configuration du stock",
           tabBarIcon: ({ color, focused }) => (
             <MaterialCommunityIcons
-              name={focused ? "store-settings" : "store-settings-outline"}
+              name={focused ? "cog" : "cog-outline"}
               color={color}
               size={24}
             />
@@ -28,8 +28,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Actuel",
-          headerTitle: "📋 Stock Actuel",
+          title: "Stock",
+          headerTitle: "🥫 Stock Actuel",
           tabBarIcon: ({ color, focused }) => (
             <MaterialCommunityIcons
               name={focused ? "fridge" : "fridge-outline"}
@@ -42,8 +42,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="shopping_list"
         options={{
-          title: "Liste de courses",
-          headerTitle: "📝 Liste de courses",
+          title: "Liste",
+          headerTitle: "📋 Liste de courses",
           tabBarIcon: ({ color, focused }) => (
             <MaterialCommunityIcons
               name={focused ? "clipboard-list" : "clipboard-list-outline"}
