@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 import * as Theme from "./theme";
 
-export const ITEM_ROW_HEIGHT = 45;
+export const ITEM_ROW_HEIGHT = 35;
 
 export const sharedStyles = StyleSheet.create({
   page: {
