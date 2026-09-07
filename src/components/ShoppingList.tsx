@@ -26,7 +26,7 @@ export const ShoppingListItem = memo(function ShoppingListItem({
     <View>
       <View style={sharedStyles.itemContainer}>
         <Text style={sharedStyles.itemNameText} numberOfLines={1}>
-          {itemName}
+          {countInList} {itemName}
         </Text>
         <View style={styles.buttonsContainer}>
           <IconButton
@@ -37,12 +37,11 @@ export const ShoppingListItem = memo(function ShoppingListItem({
             <MaterialCommunityIcons
               name="cart"
               size={Theme.ICON_BUTTON_SIZE}
-              color={Theme.COLOR_GRAY_20}
+              color={Theme.ICON_BUTTON_COLOR}
             />
             <Text style={styles.cartText}>{countInCart}</Text>
           </View>
           <IconButton icon="cart-plus" onPress={() => onAddToCart(itemId, 1)} />
-          <Text style={sharedStyles.countText}>{countInList}</Text>
           <IconButton
             icon="cart-check"
             onPress={() => onAddToCart(itemId, countInList)}
@@ -74,7 +73,8 @@ const styles = StyleSheet.create({
     bottom: 0,
     fontSize: 16,
     textAlign: "center",
-    lineHeight: 25,
+    //textAlignVertical: "center",
+    //lineHeight: 25,
     color: Theme.COLOR_GRAY_80,
     fontWeight: "bold",
   },

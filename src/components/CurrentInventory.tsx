@@ -41,7 +41,6 @@ export const CurrentInventoryItem = React.memo(function CurrentInventoryItem({
             count={currentCount}
             onChange={(newCount) => onChangeItemCount(itemId, newCount)}
             total={desiredCount}
-            reverse={true}
           />
         </View>
       </View>
@@ -51,7 +50,7 @@ export const CurrentInventoryItem = React.memo(function CurrentInventoryItem({
 
 const styles = StyleSheet.create({
   buttonsContainer: {
-    width: 90,
+    width: 120,
     flexDirection: "row",
     justifyContent: "space-between",
   },

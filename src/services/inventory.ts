@@ -93,7 +93,6 @@ export function moveItemByIndex(
   ) {
     return;
   }
-  console.log("move from " + itemIndex + " to " + afterIndex);
   inventory.rows.splice(afterIndex, 0, inventory.rows.splice(itemIndex, 1)[0]);
 }
 
@@ -143,7 +142,6 @@ export function addNewItem(
 ) {
   const index = findRowIndex(inventory, afterId);
   if (index !== -1) {
-    console.log("add item");
     inventory.rows.splice(index + 1, 0, {
       type: "item",
       name: itemName,

@@ -1,6 +1,8 @@
 import { StyleSheet } from "react-native";
 import * as Theme from "./theme";
 
+export const ITEM_ROW_HEIGHT = 45;
+
 export const sharedStyles = StyleSheet.create({
   page: {
     flex: 1,
@@ -51,7 +53,7 @@ export const sharedStyles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     //padding: 2,
-    minHeight: 35,
+    minHeight: ITEM_ROW_HEIGHT,
     margin: 0,
   },
   section: {

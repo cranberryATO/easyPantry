@@ -33,7 +33,7 @@ export const CartItem = memo(function CartItem({
             <MaterialCommunityIcons
               name="cart"
               size={Theme.ICON_BUTTON_SIZE}
-              color={Theme.COLOR_GRAY_20}
+              color={Theme.ICON_BUTTON_COLOR}
             />
             <Text style={styles.cartText}>{countInCart}</Text>
           </View>

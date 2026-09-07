@@ -1,7 +1,7 @@
 import { useInventory } from "@/components/InventoryProvider";
 import { InventorySettingsItem } from "@/components/InventorySettings";
 import { SectionHeader } from "@/components/SectionHeader";
-import { sharedStyles } from "@/theme/styles";
+import { ITEM_ROW_HEIGHT, sharedStyles } from "@/theme/styles";
 import { useHeaderHeight } from "expo-router/build/react-navigation";
 import React, { ComponentProps, useCallback, useState } from "react";
 import { ReactNativeElement, StyleSheet } from "react-native";
@@ -23,7 +23,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-const DRAGGABLE_ROW_HEIGHT = 35;
+const DRAGGABLE_ROW_HEIGHT = ITEM_ROW_HEIGHT;
 const SCROLL_VIEW_AUTOSCROLL_AREA_SIZE = 70;
 const SCROLL_VIEW_AUTOSCROLL_SPEED = 1; // scroll units per millisecond
 
@@ -53,10 +53,6 @@ function DraggableItemRow({
   children: React.ReactNode;
 }) {
   const animatedStyle = useAnimatedStyle(() => {
-    /*    console.log(
-      `index=${index} draggingItemIndex=${draggingItemIndex} dragCalculatedIndex=${dragCalculatedIndex.value}`,
-    );*/
-
     if (draggingItemIndex === index) {
       return {
         transform: [
@@ -166,7 +162,6 @@ export default function InventorySettings() {
     const scrollViewHeight = _measure != null ? _measure.height : 100000;
     const delta_t = frameInfo.timeSincePreviousFrame ?? 0;
     const dy = Math.max(0, Math.max(0, dragY.value) - scrollViewPageY);
-    console.log(`dy=${dy} dt=${delta_t}`);
     if (dy < SCROLL_VIEW_AUTOSCROLL_AREA_SIZE) {
       scrollTo(
         scrollViewRef,
@@ -202,7 +197,6 @@ export default function InventorySettings() {
 
   const handleDragStart = useCallback(
     (itemId: string) => {
-      console.log("Drag Start");
       setDraggingItemIndex(
         inventoryContext.inventory.rows.findIndex(
           (value) => value.id === itemId,
@@ -218,7 +212,6 @@ export default function InventorySettings() {
       inventoryContext.inventory.rows.length - 1,
       Math.max(1, dragCalculatedIndex.value),
     );
-    console.log(`Drag End ${draggingItemIndex}->${destInsertIndex}`);
     setDraggingItemIndex(-1);
     inventoryContext.moveItemByIndex(draggingItemIndex, destInsertIndex);
     frameCallback.setActive(false);
