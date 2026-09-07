@@ -1,7 +1,7 @@
 import { sharedStyles } from "@/theme/styles";
 import * as Theme from "@/theme/theme";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { memo, useState } from "react";
+import { memo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { IconButton } from "./IconButton";
 
@@ -22,7 +22,6 @@ export const ShoppingListItem = memo(function ShoppingListItem({
   onAddToCart: (itemId: string, count: number) => void;
   onRemoveFromList: (itemId: string) => void;
 }) {
-  const [displayedCount, setDisplayedCount] = useState<number>(countInList);
   return (
     <View>
       <View style={sharedStyles.itemContainer}>
@@ -43,10 +42,10 @@ export const ShoppingListItem = memo(function ShoppingListItem({
             <Text style={styles.cartText}>{countInCart}</Text>
           </View>
           <IconButton icon="cart-plus" onPress={() => onAddToCart(itemId, 1)} />
-          <Text style={sharedStyles.countText}>{displayedCount}</Text>
+          <Text style={sharedStyles.countText}>{countInList}</Text>
           <IconButton
             icon="cart-check"
-            onPress={() => onAddToCart(itemId, displayedCount)}
+            onPress={() => onAddToCart(itemId, countInList)}
           />
         </View>
       </View>
