@@ -1,10 +1,13 @@
+import { IconButton } from "@/components/IconButton";
 import { useInventory } from "@/components/InventoryProvider";
 import { InventorySettingsItem } from "@/components/InventorySettings";
 import { SectionHeader } from "@/components/SectionHeader";
+import { exportInventory, importInventory } from "@/services/backup";
 import { ITEM_ROW_HEIGHT, sharedStyles } from "@/theme/styles";
+import { Tabs } from "expo-router";
 import { useHeaderHeight } from "expo-router/build/react-navigation";
 import React, { ComponentProps, useCallback, useState } from "react";
-import { ReactNativeElement, StyleSheet } from "react-native";
+import { Alert, ReactNativeElement, StyleSheet } from "react-native";
 
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import Animated, {
@@ -223,71 +226,126 @@ export default function InventorySettings() {
 
   const headerHeight = useHeaderHeight();
 
+  const { inventory, replaceInventory } = useInventory();
+
+  const onExport = async () => {
+    try {
+      await exportInventory(inventory);
+    } catch (e) {
+      Alert.alert("Export impossible", (e as Error).message);
+    }
+  };
+
+  const onImport = async () => {
+    try {
+      const imported = await importInventory();
+      if (imported === null) return; // annulé
+      Alert.alert(
+        "Remplacer l'inventaire ?",
+        `${imported.rows.length} lignes seront importées. Ton inventaire actuel sera perdu.`,
+        [
+          { text: "Annuler", style: "cancel" },
+          {
+            text: "Remplacer",
+            style: "destructive",
+            onPress: () => replaceInventory(imported),
+          },
+        ],
+      );
+    } catch (e) {
+      Alert.alert("Import impossible", (e as Error).message);
+    }
+  };
+
   return (
-    <KeyboardAvoidingView
-      style={sharedStyles.page}
-      behavior={"padding"}
-      keyboardVerticalOffset={headerHeight}
-    >
-      <Animated.ScrollView
-        ref={scrollViewRef}
-        contentContainerStyle={{
-          height: DRAGGABLE_ROW_HEIGHT * inventoryContext.inventory.rows.length,
-        }}
+    <>
+      <KeyboardAvoidingView
+        style={sharedStyles.page}
+        behavior={"padding"}
+        keyboardVerticalOffset={headerHeight}
       >
-        {inventoryContext.inventory.rows.map((row, index) =>
-          row.type === "section" ? (
-            <DraggableItemRow
-              key={row.id}
-              id={row.id}
-              index={index}
-              draggingItemIndex={draggingItemIndex}
-              maxIndex={inventoryContext.inventory.rows.length}
-              dragY={dragY}
-              dragRelativeY={dragRelativeY}
-              dragTranslateY={dragTranslateY}
-              dragCalculatedIndex={dragCalculatedIndex}
-              scrollViewRef={scrollViewRef}
-              style={sharedStyles.sectionTitleContainer}
-            >
-              <SectionHeader
+        <Animated.ScrollView
+          ref={scrollViewRef}
+          contentContainerStyle={{
+            height:
+              DRAGGABLE_ROW_HEIGHT * inventoryContext.inventory.rows.length,
+          }}
+        >
+          {inventoryContext.inventory.rows.map((row, index) =>
+            row.type === "section" ? (
+              <DraggableItemRow
+                key={row.id}
                 id={row.id}
-                name={row.name}
-                onAddNewItem={handleAddNewItemToSection}
-              />
-            </DraggableItemRow>
-          ) : (
-            <DraggableItemRow
-              key={row.id}
-              id={row.id}
-              index={index}
-              draggingItemIndex={draggingItemIndex}
-              maxIndex={inventoryContext.inventory.rows.length - 1}
-              dragY={dragY}
-              dragRelativeY={dragRelativeY}
-              dragTranslateY={dragTranslateY}
-              dragCalculatedIndex={dragCalculatedIndex}
-              scrollViewRef={scrollViewRef}
-              style={sharedStyles.itemContainer}
-            >
-              <InventorySettingsItem
-                itemId={row.id}
-                itemName={row.name}
-                itemCount={row.desiredCount}
-                onChangeItemCount={handleItemCountChanged}
-                onChangeItemName={handleItemNameChanged}
-                onMove={handleMoveItem}
-                onRemove={handleRemoveItem}
-                onDragStart={handleDragStart}
-                onDragEnd={handleDragEnd}
-                dragTranslationY={dragTranslateY}
+                index={index}
+                draggingItemIndex={draggingItemIndex}
+                maxIndex={inventoryContext.inventory.rows.length}
                 dragY={dragY}
+                dragRelativeY={dragRelativeY}
+                dragTranslateY={dragTranslateY}
+                dragCalculatedIndex={dragCalculatedIndex}
+                scrollViewRef={scrollViewRef}
+                style={sharedStyles.sectionTitleContainer}
+              >
+                <SectionHeader
+                  id={row.id}
+                  name={row.name}
+                  onAddNewItem={handleAddNewItemToSection}
+                />
+              </DraggableItemRow>
+            ) : (
+              <DraggableItemRow
+                key={row.id}
+                id={row.id}
+                index={index}
+                draggingItemIndex={draggingItemIndex}
+                maxIndex={inventoryContext.inventory.rows.length - 1}
+                dragY={dragY}
+                dragRelativeY={dragRelativeY}
+                dragTranslateY={dragTranslateY}
+                dragCalculatedIndex={dragCalculatedIndex}
+                scrollViewRef={scrollViewRef}
+                style={sharedStyles.itemContainer}
+              >
+                <InventorySettingsItem
+                  itemId={row.id}
+                  itemName={row.name}
+                  itemCount={row.desiredCount}
+                  onChangeItemCount={handleItemCountChanged}
+                  onChangeItemName={handleItemNameChanged}
+                  onMove={handleMoveItem}
+                  onRemove={handleRemoveItem}
+                  onDragStart={handleDragStart}
+                  onDragEnd={handleDragEnd}
+                  dragTranslationY={dragTranslateY}
+                  dragY={dragY}
+                />
+              </DraggableItemRow>
+            ),
+          )}
+        </Animated.ScrollView>
+      </KeyboardAvoidingView>
+      <Tabs.Screen
+        options={{
+          headerRight: () => (
+            <>
+              <IconButton
+                icon="import"
+                size={30}
+                onPress={onImport}
+                style={{ marginRight: 10 }}
               />
-            </DraggableItemRow>
+
+              <IconButton
+                icon="export"
+                size={30}
+                onPress={onExport}
+                style={{ marginRight: 10 }}
+              />
+            </>
           ),
-        )}
-      </Animated.ScrollView>
-    </KeyboardAvoidingView>
+        }}
+      />
+    </>
   );
 }
 

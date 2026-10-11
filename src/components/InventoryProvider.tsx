@@ -24,6 +24,7 @@ type InventoryContextValue = {
   addNewItem: (itemId: string, itemName: string) => void;
   replaceRows: (rows: Inventory.InventoryRow[]) => void;
   addAllCartItemsToInventory: () => void;
+  replaceInventory: (inventory: Inventory.Inventory) => void;
 };
 
 const InventoryContext = createContext<InventoryContextValue | null>(null);
@@ -145,6 +146,10 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
     );
   }, []);
 
+  const replaceInventory = useCallback((next: Inventory.Inventory) => {
+    setInventory(next);
+  }, []);
+
   return (
     <InventoryContext.Provider
       value={{
@@ -157,6 +162,7 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
         addNewItem,
         replaceRows,
         addAllCartItemsToInventory,
+        replaceInventory,
       }}
     >
       {children}

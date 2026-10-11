@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Crypto from "expo-crypto";
 
 const INVENTORY_KEY = "inventory";
-const ITEMS_MAX = 99;
+export const ITEMS_MAX = 99;
 
 export type InventorySection = {
   type: "section";
